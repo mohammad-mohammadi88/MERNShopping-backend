@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+
 import type ProductAttrType from "./products.attr.model.d.js";
 
 const productAttrSchema: Schema = new Schema({

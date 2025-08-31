@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+
 import type ProductCategoryType from "./products.category.model.d.js";
 import ProductAttrModel from "./products.attr.model.js";
 

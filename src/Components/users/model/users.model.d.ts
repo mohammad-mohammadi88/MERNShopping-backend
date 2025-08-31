@@ -6,6 +6,7 @@ export default interface UserType extends Document {
     email: string;
     totalOrders: number;
     createdAt: Date;
+    updatedAt: Date;
     wallet: number;
     mobile: string;
 }
