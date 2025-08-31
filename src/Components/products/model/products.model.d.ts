@@ -1,4 +1,5 @@
-import type { Document } from "mongoose";
+import type { Document, Types } from "mongoose";
+
 import productStatus from "../products.status";
 import type ProductAttrType from "./products.attr.model.d.js";
 
@@ -8,7 +9,7 @@ export default interface ProductType extends Document {
     salePrice: number;
     thumbnail: string;
     gallery?: string[];
-    productCategory: string;
+    productCategory: Types.ObjectId;
     attrs: ProductAttrType[];
     createdAt: Date;
     updatedAt: Date;

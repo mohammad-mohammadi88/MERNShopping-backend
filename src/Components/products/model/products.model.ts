@@ -1,25 +1,28 @@
 import { model, Schema } from "mongoose";
 
+import ProductAttrModel from "./products.attr.model.js";
 import type ProductType from "./products.model.d.js";
 import productStatus from "../products.status.js";
-import ProductAttrModel from "./products.attr.model.js";
+import refrence from "@/contracts/refrence.js";
 
-const productSchema: Schema = new Schema(
+const statusType = {
+    type: Number,
+    enum: Object.values(productStatus),
+    default: productStatus.INIT,
+};
+const productSchema: Schema<ProductType> = new Schema(
     {
         title: { type: String, required: true },
         thumbnail: { type: String, required: true },
         price: { type: Number, required: true },
         salePrice: { type: Number },
         gallery: { type: [String] },
-        productCategory: {
-            type: Schema.Types.ObjectId,
-            ref: "ProductCategory",
-        },
+        productCategory: refrence("ProductCategory"),
         attrs: [ProductAttrModel.schema],
-        status: { type: productStatus, default: productStatus.INIT },
+        status: statusType,
     },
     { timestamps: true }
 );
 
-const ProductModel = model<ProductType>("Product", productSchema);
+const ProductModel = model("Product", productSchema);
 export default ProductModel;

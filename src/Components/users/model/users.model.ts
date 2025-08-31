@@ -1,7 +1,7 @@
 import { model, Schema } from "mongoose";
 import type UserType from "./users.model.d.js";
 
-const userSchema: Schema = new Schema(
+const userSchema: Schema<UserType> = new Schema(
     {
         firstName: { type: String, required: true },
         lastName: { type: String, required: true },
@@ -13,5 +13,5 @@ const userSchema: Schema = new Schema(
     { timestamps: true }
 );
 
-const UserModel = model<UserType>("User", userSchema);
+const UserModel = model("User", userSchema);
 export default UserModel;
