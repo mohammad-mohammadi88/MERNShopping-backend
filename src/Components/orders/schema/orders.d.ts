@@ -1,5 +1,5 @@
 import type { Document, Types } from "mongoose";
-import ordersStatus from "../orders.status.js";
+import ordersStatus from "../orders.status.ts";
 
 interface Coupon {
     percent: number;

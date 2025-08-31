@@ -1,6 +1,6 @@
-import { model, Schema } from "mongoose";
+import { Schema } from "mongoose";
 
-import type ProductAttrType from "./products.attr.model.d.js";
+import type ProductAttrType from "./products.attr.d.js";
 
 const productAttrSchema: Schema<ProductAttrType> = new Schema({
     title: { type: String, required: true },
@@ -9,5 +9,4 @@ const productAttrSchema: Schema<ProductAttrType> = new Schema({
     isMultiple: { type: Boolean, default: false },
 });
 
-const ProductAttrModel = model("ProductAttr", productAttrSchema);
-export default ProductAttrModel;
+export default productAttrSchema;
