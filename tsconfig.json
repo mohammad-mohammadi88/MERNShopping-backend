@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "rootDir": "./src",
+        "outDir": "./dist",
+
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
+        "target": "es2024",
+        "lib": ["esnext"],
+        "types": ["node"],
+        "verbatimModuleSyntax": true,
+        "resolveJsonModule": true,
+
+        "removeComments": true,
+        "strict": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+
+        "baseUrl": "./src",
+        "paths": {
+            "@/*": ["*"]
+        }
+    },
+    "include": ["src"]
+}
