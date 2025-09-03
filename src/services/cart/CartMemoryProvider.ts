@@ -1,7 +1,8 @@
 import type ProductType from "@Products/schema/products.d.js";
+import type CartProvider from "./CartProvider.d.js";
 
-export default class CartMemoryProvider {
-    private cartItems: ProductType[] = [];
+export default class CartMemoryProvider implements CartProvider {
+    cartItems: ProductType[] = [];
     public add = (product: ProductType): number => this.cartItems.push(product);
 
     public remove = (product: ProductType) =>
