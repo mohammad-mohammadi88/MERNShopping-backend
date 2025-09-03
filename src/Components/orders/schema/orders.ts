@@ -6,13 +6,6 @@ import ordersStatus from "../orders.status.js";
 import refrence from "@/shared/refrence.js";
 import type OrderType from "./orders.d.js";
 
-const couponType = {
-    type: {
-        percent: { type: Number },
-        code: { type: String },
-    },
-    default: null,
-};
 const statusType = {
     type: Number,
     required: true,
@@ -23,7 +16,7 @@ const orderSchema: Schema<OrderType> = new Schema(
     {
         finalPrice: { type: Number, required: true },
         totalPrice: { type: Number, required: true },
-        coupon: couponType,
+        coupon: refrence("Coupon"),
         userId: refrence("User"),
         status: statusType,
         deliveryAddress: { type: userAddressSchema },

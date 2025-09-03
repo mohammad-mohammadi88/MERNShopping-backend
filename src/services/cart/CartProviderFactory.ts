@@ -1,12 +1,13 @@
 import CartMemoryProvider from "./CartMemoryProvider.js";
-import type CartProvider from "./CartProvider.d.js";
 import CartRedisProvider from "./CartRedisPrivider.js";
+import type CartProvider from "./CartProvider.d.js";
 
 export default class CartProviderFactore {
     private providers: Map<string, CartProvider> = new Map<
         string,
         CartProvider
     >();
+
     constructor() {
         this.providers.set("memory", new CartMemoryProvider());
         this.providers.set("redis", new CartRedisProvider());
