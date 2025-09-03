@@ -1,5 +1,7 @@
 import { Schema } from "mongoose";
+
 import type UserType from "./users.d.js";
+import userAddressSchema from "./users.address.js";
 
 const userSchema: Schema<UserType> = new Schema(
     {
@@ -7,6 +9,7 @@ const userSchema: Schema<UserType> = new Schema(
         lastName: { type: String, required: true },
         email: { type: String, required: true, unique: true },
         mobile: { type: String, required: true, unique: true },
+        addresses: { type: [userAddressSchema], default: [] },
         totalOrders: { type: Number, default: 0 },
         wallet: { type: Number, default: 0 },
     },

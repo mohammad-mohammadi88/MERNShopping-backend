@@ -1,7 +1,7 @@
 import express from "express";
 
-import defaults from "./contracts/defaults.js";
-import mongooseConnection from "./contracts/mongoose.connection.js";
+import { defaults, mongooseConnection } from "./shared/index.js";
+import usersRouter from "@Users/users.route.js";
 
 const app = express();
 
@@ -11,6 +11,9 @@ const app = express();
 
     // middleware
     app.use(express.json());
+
+    // routes
+    app.use("/users", usersRouter);
 
     // listen
     app.listen(defaults.port, "0.0.0.0", () =>

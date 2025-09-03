@@ -1,4 +1,5 @@
 import type { Document } from "mongoose";
+import type UserAddressType from "./users.address";
 
 export default interface UserType extends Document {
     firstName: string;
@@ -7,6 +8,7 @@ export default interface UserType extends Document {
     totalOrders: number;
     createdAt: Date;
     updatedAt: Date;
+    addresses: UserAddressType[];
     wallet: number;
     mobile: string;
 }

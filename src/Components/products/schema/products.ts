@@ -3,7 +3,7 @@ import { Schema } from "mongoose";
 import productAttrSchema from "./products.attr.js";
 import type ProductType from "./products.d.js";
 import productStatus from "../products.status.js";
-import refrence from "@/contracts/refrence.js";
+import refrence from "@/shared/refrence.js";
 
 const statusType = {
     type: Number,

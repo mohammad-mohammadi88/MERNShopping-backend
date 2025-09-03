@@ -1,13 +1,13 @@
 import { Schema } from "mongoose";
 
-import type ProductOfferType from "../schema/productOffer.d.js";
-import refrence from "@/contracts/refrence.js";
+import type ProductOfferType from "./productOffer.d.js";
+import productOfferItemSchema from "./productOffer.item.js";
 
 const productOfferSchema: Schema<ProductOfferType> = new Schema(
     {
         startDate: { type: Date, required: true },
         endDate: { type: Date, required: true },
-        products: [refrence("Product")],
+        products: { type: [productOfferItemSchema], require: true },
     },
     { timestamps: true }
 );
