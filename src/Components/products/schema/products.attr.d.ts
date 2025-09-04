@@ -1,6 +1,6 @@
 import type { Document } from "mongoose";
 
-export default interface ProductAttrType extends Document {
+export default interface IProductAttr extends Document {
     title: string;
     name: string;
     filterable: boolean;

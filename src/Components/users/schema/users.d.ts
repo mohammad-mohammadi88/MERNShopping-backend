@@ -1,7 +1,7 @@
 import type { Document } from "mongoose";
 import type UserAddressType from "./users.address";
 
-export default interface UserType extends Document {
+export default interface IUser extends Document {
     firstName: string;
     lastName: string;
     email: string;

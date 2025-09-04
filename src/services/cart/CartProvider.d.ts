@@ -1,6 +1,8 @@
+import type IProduct from "@Products/schema/products";
+
 export default interface CartProvider {
-    add: (product: ProductType) => any;
-    remove: (product: ProductType) => any;
+    add: (product: IProduct) => any;
+    remove: (product: IProduct) => any;
     items: () => any;
     count: () => any;
     clear: () => any;

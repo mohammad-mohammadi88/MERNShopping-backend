@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
-import type UserType from "./users.address.d.js";
+import type IUser from "./users.address.d.js";
 
-const userAddressSchema: Schema<UserType> = new Schema({
+const userAddressSchema: Schema<IUser> = new Schema({
     fullName: { type: String, required: true },
     title: { type: String, required: true },
     address: { type: String, required: true },

@@ -1,9 +1,9 @@
 import { Schema } from "mongoose";
 
-import type ProductOfferType from "./productOffer.d.js";
+import type IProductOffer from "./productOffer.d.js";
 import productOfferItemSchema from "./productOffer.item.js";
 
-const productOfferSchema: Schema<ProductOfferType> = new Schema(
+const productOfferSchema: Schema<IProductOffer> = new Schema(
     {
         startDate: { type: Date, required: true },
         endDate: { type: Date, required: true },

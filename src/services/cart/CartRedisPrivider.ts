@@ -1,17 +1,17 @@
 import redisConnection from "@/shared/redis.js";
 import type CartProvider from "./CartProvider.d.js";
 import type CartConfig from "./CartConfig.d.js";
-import type ProductType from "@Products/schema/products.d.js";
+import type IProduct from "@Products/schema/products.d.js";
 
 export default class CartRedisProvider implements CartProvider, CartConfig {
     key: string = "";
 
     config = (config: string) => (this.key = config);
 
-    public add = (product: ProductType): Promise<number> =>
+    public add = (product: IProduct): Promise<number> =>
         redisConnection.lpush(this.key, JSON.stringify(product));
 
-    public remove = async (product: ProductType): Promise<number> =>
+    public remove = async (product: IProduct): Promise<number> =>
         redisConnection.lrem(this.key, 0, JSON.stringify(product));
 
     public items = () =>

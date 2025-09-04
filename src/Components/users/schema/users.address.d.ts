@@ -1,6 +1,6 @@
 import type { Document } from "mongoose";
 
-export default interface UserAddressType extends Document {
+export default interface IUserAddress extends Document {
     title: string;
     state: string;
     city: string;

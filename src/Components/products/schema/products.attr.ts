@@ -1,8 +1,8 @@
 import { Schema } from "mongoose";
 
-import type ProductAttrType from "./products.attr.d.js";
+import type IProductAttr from "./products.attr.d.js";
 
-const productAttrSchema: Schema<ProductAttrType> = new Schema({
+const productAttrSchema: Schema<IProductAttr> = new Schema({
     title: { type: String, required: true },
     name: { type: String, required: true },
     filterable: { type: Boolean, default: false },
