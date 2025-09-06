@@ -1,10 +1,10 @@
 import type { Document } from "mongoose";
 
-import type ProductOfferItemType from "./productOffer.item";
+import type IProductOfferItem from "./productOffer.item";
 
-export default interface ProductOfferType extends Document {
+export default interface IProductOffer extends Document {
     startDate: Date;
-    products: ProductOfferItemType[];
+    products: IProductOfferItem[];
     endDate: Date;
     createdAt: Date;
     updatedAt: Date;

@@ -5,7 +5,8 @@ import defaults from "./defaults.js";
 
 const connect = () =>
     mongoose.connect(defaults.databaseUrl).then(
-        () => console.log(styleText("greenBright", "Database is Connected")),
+        () =>
+            console.log(styleText("greenBright", "\nDatabase is Connected\n")),
         (e) =>
             console.log(
                 styleText(

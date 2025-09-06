@@ -1,16 +1,16 @@
 import { Schema } from "mongoose";
 
 import productAttrSchema from "./products.attr.js";
-import type ProductType from "./products.d.js";
+import type IProduct from "./products.d.js";
 import productStatus from "../products.status.js";
-import refrence from "@/contracts/refrence.js";
+import refrence from "@/shared/refrence.js";
 
 const statusType = {
     type: Number,
     enum: Object.values(productStatus),
     default: productStatus.INIT,
 };
-const productSchema: Schema<ProductType> = new Schema(
+const productSchema: Schema<IProduct> = new Schema(
     {
         title: { type: String, required: true },
         thumbnail: { type: String, required: true },
