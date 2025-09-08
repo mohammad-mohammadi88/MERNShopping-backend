@@ -1,5 +1,7 @@
+import type CartConfig from "./CartConfig.js";
 import CartMemoryProvider from "./CartMemoryProvider.js";
 import type CartProvider from "./CartProvider.d.js";
+import CartRedisProvider from "./CartRedisProvider.js";
 
 export default class CartProviderFactore {
     private providers: Map<string, CartProvider> = new Map<
@@ -9,7 +11,11 @@ export default class CartProviderFactore {
 
     constructor() {
         this.providers.set("memory", new CartMemoryProvider());
+        this.providers.set("redis", new CartRedisProvider());
     }
+
+    public config = (key: string) =>
+        (this.providers.get("redis") as CartProvider & CartConfig).config(key);
 
     public setProvider = this.providers.set;
 
