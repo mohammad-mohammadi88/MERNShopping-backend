@@ -1,3 +1,4 @@
+import cors from "cors";
 import express from "express";
 
 import productCategoryRouter from "@P_Category/productCategory.route.js";
@@ -6,16 +7,17 @@ import { defaults, mongooseConnection } from "./shared/index.js";
 
 const app = express();
 
-app.get("/healthCheck", (_, res) => res.send("ok"));
-
 (async () => {
     // connect mongo
     await mongooseConnection.connect();
 
     // middleware
+    app.use(cors());
     app.use(express.json());
 
     // routes
+    app.get("/healthCheck", (_, res) => res.send("ok"));
+
     app.use("/users", usersRouter);
     app.use("/categories", productCategoryRouter);
 

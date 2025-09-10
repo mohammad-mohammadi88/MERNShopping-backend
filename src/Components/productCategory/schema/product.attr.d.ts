@@ -2,6 +2,7 @@ import type { Document } from "mongoose";
 
 export default interface IProductAttr extends Document {
     title: string;
+    description: string;
     filterable: boolean;
-    isMultiple: boolean;
+    hasPrice: boolean;
 }

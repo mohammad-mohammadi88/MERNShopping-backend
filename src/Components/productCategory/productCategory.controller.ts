@@ -14,7 +14,7 @@ const postCategoryCTRL: RequestHandler<
     PostSchema
 > = async (req, res) => {
     const category = await productCategoryStore.addCategory(req.body);
-    return res.status(typeof category === "string" ? 500 : 201).json(category);
+    return res.status(typeof category === "string" ? 500 : 201).send(category);
 };
 
 export const postCategoryHandler: any[] = [
