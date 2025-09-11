@@ -3,21 +3,21 @@ import { z } from "zod";
 const title = z.string();
 
 const boolean = z.boolean().optional();
-const attr = z.object({
+export const attrSchema = z.object({
     title,
     description: title,
     filterable: boolean,
     hasPrice: boolean,
 });
 
-const attrGroup = z.object({
+const categoryAttrGroupSchema = z.object({
     title,
-    attrs: z.array(attr),
+    attrs: z.array(attrSchema),
 });
 
 // post Category Schema
 export const postCategorySchema = z.object({
     title,
-    attrGroups: z.array(attrGroup),
+    attrGroups: z.array(categoryAttrGroupSchema),
 });
-export type PostSchema = z.infer<typeof postCategorySchema>;
+export type PostCategorySchema = z.infer<typeof postCategorySchema>;

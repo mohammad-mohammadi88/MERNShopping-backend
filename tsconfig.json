@@ -34,8 +34,8 @@
             "@Users/*": [
                 "Components/users/*"
             ],
-            "@P_Offer/*": [
-                "Components/productOffer/*"
+            "@P_Offers/*": [
+                "Components/productOffers/*"
             ],
             "@Orders/*": [
                 "Components/orders/*"

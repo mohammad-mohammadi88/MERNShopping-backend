@@ -1,7 +1,7 @@
 import type { Document, Types } from "mongoose";
 
-import productStatus from "../products.status";
-import type IProductAttr from "./products.attr.schema";
+import type IProductAttr from "@P_Category/schema/product.attr.d.js";
+import productStatus from "../products.status.js";
 
 export default interface IProduct extends Document {
     title: string;
