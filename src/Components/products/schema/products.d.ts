@@ -6,7 +6,7 @@ import productStatus from "../products.status.js";
 export default interface IProduct extends Document {
     title: string;
     price: number;
-    salePrice: number;
+    salePrice?: number;
     thumbnail: string;
     gallery?: string[];
     productCategory: Types.ObjectId;

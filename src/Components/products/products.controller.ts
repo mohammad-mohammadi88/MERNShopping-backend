@@ -1,11 +1,12 @@
 import type { RequestHandler } from "express";
 
-import { validate, validateAsync } from "@/middlewares/index.js";
-import productStore, { type GetProducts } from "./products.db.js";
-import {
-    paginationSchema,
-    postProductSchema,
+import { validateAsync } from "@/middlewares/index.js";
+import productStore, {
+    type GetProducts,
     type Pagination,
+} from "./products.db.js";
+import {
+    postProductSchema,
     type PostProductSchema,
 } from "./products.validate.js";
 import type IProduct from "./schema/products.d.js";
@@ -26,19 +27,24 @@ export const postProductHandler: any[] = [
 ];
 
 // Get All Products
-const getAllProductsCTRL: RequestHandler<
+const check = (i: number): boolean => i < 1 || !Number.isInteger(i);
+export const getAllProductsHandler: RequestHandler<
     null,
     string | GetProducts,
+    null,
     Pagination
 > = async (req, res) => {
-    const products = await productStore.getProducts(req.body);
+    let pagination: Required<Pagination> | undefined = {
+        page: Number(req.query.page) ?? -1,
+        perPage: Number(req.query.perPage) ?? -1,
+    };
+    if (check(pagination.page) || check(pagination.perPage))
+        pagination = undefined;
+
+    const products = await productStore.getProducts(pagination);
     const error = typeof products === "string";
     return res.status(error ? 500 : 200).send(products);
 };
-export const getAllProductsHandler: any[] = [
-    validate(paginationSchema),
-    getAllProductsCTRL,
-];
 
 // Get Product By Id
 export const getProductByIdHandler: RequestHandler<

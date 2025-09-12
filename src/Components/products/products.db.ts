@@ -1,6 +1,6 @@
 import errorHandler from "@/shared/errorHandler.js";
 import ProductModel from "./model/products.model.js";
-import type { Pagination, PostProductSchema } from "./products.validate.js";
+import type { PostProductSchema } from "./products.validate.js";
 import type IProduct from "./schema/products.d.js";
 
 export interface GetProducts {
@@ -8,6 +8,10 @@ export interface GetProducts {
     products: IProduct[];
     perPage: number;
     currentPage: number;
+}
+export interface Pagination {
+    perPage?: number;
+    page?: number;
 }
 class ProductStore {
     addProduct = (data: PostProductSchema) =>
@@ -19,7 +23,9 @@ class ProductStore {
     getProductById = (id: string) =>
         errorHandler(() => ProductModel.findById(id), "getting product by id");
 
-    getProducts = (pagination?: Pagination): Promise<string | GetProducts> =>
+    getProducts = (
+        pagination?: Required<Pagination>
+    ): Promise<string | GetProducts> =>
         errorHandler(async (): Promise<GetProducts> => {
             const result = ProductModel.find();
             const totalDocs = await ProductModel.countDocuments();
