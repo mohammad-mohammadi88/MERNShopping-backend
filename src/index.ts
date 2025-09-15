@@ -1,5 +1,8 @@
+import { v2 as cloudinary } from "cloudinary";
+import compression from "compression";
 import cors from "cors";
 import express from "express";
+import helmet from "helmet";
 
 import {
     couponRouter,
@@ -18,8 +21,13 @@ const app = express();
     // connect mongo
     await mongooseConnection.connect();
 
+    // config cloudinary
+    cloudinary.config(defaults.cloudinary);
+
     // middleware
     app.use(cors());
+    app.use(compression());
+    app.use(helmet());
     app.use(express.json());
 
     // routes

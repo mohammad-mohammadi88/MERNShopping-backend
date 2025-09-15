@@ -13,17 +13,26 @@
     "license": "MIT",
     "type": "module",
     "devDependencies": {
+        "@types/compression": "^1.8.1",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
+        "@types/express-fileupload": "^1.5.1",
+        "@types/streamifier": "^0.1.2",
         "tsc-alias": "^1.8.16",
         "tsx": "^4.20.5",
         "typescript": "^5.9.2"
     },
     "dependencies": {
+        "cloudinary": "^2.7.0",
+        "compression": "^1.8.1",
         "cors": "^2.8.5",
         "dotenv": "^17.2.1",
         "express": "^5.1.0",
+        "express-fileupload": "^1.5.2",
+        "helmet": "^8.1.0",
         "mongoose": "^8.18.0",
+        "sharp": "^0.34.3",
+        "streamifier": "^0.1.1",
         "tedis": "^0.1.12",
         "zod": "^4.1.5"
     }

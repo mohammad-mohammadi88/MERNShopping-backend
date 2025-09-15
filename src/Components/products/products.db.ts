@@ -1,3 +1,4 @@
+import type { Images } from "@/services/cloudinary/request.js";
 import errorHandler from "@/shared/errorHandler.js";
 import ProductModel from "./model/products.model.js";
 import type { PostProductSchema } from "./products.validate.js";
@@ -14,7 +15,7 @@ export interface Pagination {
     page?: number;
 }
 class ProductStore {
-    addProduct = (data: PostProductSchema) =>
+    addProduct = (data: PostProductSchema & Images) =>
         errorHandler(
             () => new ProductModel(data).save(),
             "creating new product"

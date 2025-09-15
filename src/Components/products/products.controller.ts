@@ -1,6 +1,8 @@
 import type { RequestHandler } from "express";
 
-import { validateAsync } from "@/middlewares/index.js";
+import imageResize from "@/middlewares/imageResize.js";
+import validateAsync from "@/middlewares/validateAsync.js";
+import fileUpload from "express-fileupload";
 import productStore, {
     type GetProducts,
     type Pagination,
@@ -17,11 +19,16 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
-    const newProduct = await productStore.addProduct(req.body);
+    const newProduct = await productStore.addProduct({
+        ...req.body,
+        ...req.images,
+    });
     const error = typeof newProduct === "string";
     return res.status(error ? 500 : 201).send(newProduct);
 };
 export const postProductHandler: any[] = [
+    fileUpload(),
+    imageResize,
     validateAsync(postProductSchema),
     postProductCTRL,
 ];

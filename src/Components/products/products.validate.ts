@@ -26,13 +26,25 @@ const productCategory = z
     .refine(checkCategoryExistence, categoryNotFound);
 
 // product base schema
+const price = z.preprocess((val) => {
+    const num = Number(val);
+    return num || undefined;
+}, z.number().positive());
+
+const attrs = z.preprocess((val) => {
+    if (typeof val !== "string") return val;
+    try {
+        return JSON.parse(val);
+    } catch {
+        return undefined;
+    }
+}, z.array(attrSchema));
+
 const productSchemaBase = {
     title: z.string(),
-    thumbnail: z.string(),
-    price: z.number(),
+    price,
     productCategory,
-    attrs: z.array(attrSchema),
-    gallery: z.array(z.string()).optional(),
+    attrs,
 };
 
 // post product schema
