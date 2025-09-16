@@ -1,7 +1,8 @@
 import type { Document, Types } from "mongoose";
 
-import type IProductAttr from "@P_Category/schema/product.attr.d.js";
 import productStatus from "../products.status.js";
+import type IProductAttr from "./product.attr.d.js";
+import type IProductColor from "./product.color.d.js";
 
 export default interface IProduct extends Document {
     title: string;
@@ -10,6 +11,7 @@ export default interface IProduct extends Document {
     thumbnail: string;
     gallery?: string[];
     quantity: number;
+    colors: IProductColor[];
     productCategory: Types.ObjectId;
     attrs: IProductAttr[];
     createdAt: Date;

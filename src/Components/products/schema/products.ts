@@ -1,8 +1,9 @@
 import { Schema } from "mongoose";
 
 import refrence from "@/shared/refrence.js";
-import productAttrSchema from "@P_Category/schema/product.attr.js";
 import productStatus from "../products.status.js";
+import productAttrSchema from "./product.attr.js";
+import productColorSchema from "./product.color.js";
 import type IProduct from "./products.d.js";
 
 const statusType = {
@@ -16,10 +17,11 @@ const productSchema: Schema<IProduct> = new Schema(
         thumbnail: { type: String, required: true },
         price: { type: Number, required: true },
         salePrice: { type: Number },
+        colors: { type: [productColorSchema], default: [] },
         gallery: { type: [String], default: [] },
         quantity: { type: Number, default: 0 },
         productCategory: refrence("ProductCategory"),
-        attrs: [productAttrSchema],
+        attrs: { type: [productAttrSchema], default: [] },
         status: statusType,
     },
     { timestamps: true }

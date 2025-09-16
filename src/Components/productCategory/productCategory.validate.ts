@@ -2,17 +2,9 @@ import { z } from "zod";
 
 const title = z.string();
 
-const boolean = z.boolean().optional();
-export const attrSchema = z.object({
-    title,
-    description: title,
-    filterable: boolean,
-    hasPrice: boolean,
-});
-
 const categoryAttrGroupSchema = z.object({
     title,
-    attrs: z.array(attrSchema),
+    attrs: z.array(z.string()),
 });
 
 // post Category Schema

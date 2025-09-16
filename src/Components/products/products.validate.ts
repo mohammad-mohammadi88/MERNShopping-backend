@@ -1,7 +1,6 @@
 import { z } from "zod";
-
+///^#(?:[0-9a-fA-F]{3}){1,2}$/
 import productCategoryStore from "@P_Category/productCategory.db.js";
-import { attrSchema } from "@P_Category/productCategory.validate.js";
 import productsStatus from "./products.status.js";
 
 // chech category funtionality
@@ -22,6 +21,19 @@ const number = (schema: z.core.SomeType = z.number().positive()) =>
         return num || undefined;
     }, schema);
 
+// product attribute schema
+const attrSchema = z.object({
+    title: z.string(),
+    description: z.string(),
+});
+
+// product color schema
+const colorSchema = z.object({
+    title: z.string(),
+    color: z.string().regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, "Invalid hex color"),
+    priceEffect: number(z.number().nonnegative().optional()),
+});
+
 // category not found message
 const categoryNotFound = {
     error: "Category not found",
@@ -33,14 +45,15 @@ const productCategory = z
     .string()
     .refine(checkCategoryExistence, categoryNotFound);
 
-const attrs = z.preprocess((val) => {
-    if (typeof val !== "string") return val;
-    try {
-        return JSON.parse(val);
-    } catch {
-        return undefined;
-    }
-}, z.array(attrSchema));
+const array = (schema: z.core.SomeType) =>
+    z.preprocess((val) => {
+        if (typeof val !== "string") return val;
+        try {
+            return JSON.parse(val);
+        } catch {
+            return undefined;
+        }
+    }, schema);
 
 const productSchemaBase = {
     title: z.string(),
@@ -49,7 +62,8 @@ const productSchemaBase = {
         z.number().nonnegative().int("quantity cannot be flout").optional()
     ),
     productCategory,
-    attrs,
+    attrs: array(z.array(attrSchema).optional()),
+    colors: array(z.array(colorSchema).optional()),
 };
 
 // post product schema

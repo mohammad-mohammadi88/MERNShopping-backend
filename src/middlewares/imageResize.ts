@@ -80,7 +80,6 @@ const imageResize: (action: Action) => RequestHandler =
             gallery: await handleGallery(req, action, gallery),
         };
         req.images = newImages;
-        console.log("second");
         next();
     };
 
