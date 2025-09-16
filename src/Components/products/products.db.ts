@@ -1,7 +1,10 @@
 import type { Images } from "@/services/cloudinary/request.js";
 import errorHandler from "@/shared/errorHandler.js";
 import ProductModel from "./model/products.model.js";
-import type { PostProductSchema } from "./products.validate.js";
+import type {
+    EditProductSchema,
+    PostProductSchema,
+} from "./products.validate.js";
 import type IProduct from "./schema/products.d.js";
 
 export interface GetProducts {
@@ -48,6 +51,18 @@ class ProductStore {
 
             return { pages, perPage, currentPage, products };
         }, "getting products");
+
+    editProduct = (id: string, data: EditProductSchema & Images) =>
+        errorHandler(
+            () => ProductModel.findByIdAndUpdate(id, data),
+            "editing product"
+        );
+
+    deleteProduct = (id: string) =>
+        errorHandler(
+            () => ProductModel.findByIdAndDelete(id),
+            "deleting product"
+        );
 }
 
 const productStore = new ProductStore();

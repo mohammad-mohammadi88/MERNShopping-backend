@@ -1,9 +1,11 @@
 import type { Request, RequestHandler } from "express";
-import type fileUpload from "express-fileupload";
+import type { UploadedFile } from "express-fileupload";
 
-import deleteImage from "@/services/cloudinary/deleteImage.js";
-import type { DestroyedImages } from "@/services/cloudinary/request.js";
-import urlToPublicId from "@/shared/urlToPublicId.js";
+import {
+    deleteImage,
+    type DestroyedImages,
+} from "@/services/cloudinary/index.js";
+import { getDecodedName, urlToPublicId } from "@/shared/index.js";
 import productStore from "@Products/products.db.js";
 import type { EditProductSchema } from "@Products/products.validate.js";
 
@@ -14,7 +16,7 @@ import type { EditProductSchema } from "@Products/products.validate.js";
  * - if it is a string we push it to gallery param.
  * This function can be used to add both thumbnail and gallery
  */
-const addToDestroyedImagesList = (
+const markDestroyedImages = (
     req: Request,
     value: boolean | string[] | string
 ): void => {
@@ -36,8 +38,8 @@ const addToDestroyedImagesList = (
  * so this function ensures it is always an array.
  */
 const normalizeGalleryInput = (
-    gallery: fileUpload.UploadedFile[] | fileUpload.UploadedFile | undefined
-): fileUpload.UploadedFile[] | undefined => {
+    gallery: UploadedFile[] | UploadedFile | undefined
+): UploadedFile[] | undefined => {
     if (!gallery) return undefined;
     return Array.isArray(gallery) ? gallery : [gallery];
 };
@@ -50,36 +52,33 @@ const normalizeGalleryInput = (
  */
 const getImagesToDestroyOnEdit = (
     prevProduct: { thumbnail: string; gallery?: string[] },
-    thumbnail: fileUpload.UploadedFile | undefined,
-    gallery: fileUpload.UploadedFile[] | undefined,
+    thumbnail: UploadedFile | undefined,
+    gallery: UploadedFile[] | undefined,
     req: Request
 ): string[] => {
     const images: string[] = [];
 
     // Check thumbnail
     // mark thumbnail as distroyed image
-    if (
-        thumbnail &&
-        decodeURIComponent(thumbnail.name) !== prevProduct.thumbnail
-    ) {
+    if (thumbnail && getDecodedName(thumbnail) !== prevProduct.thumbnail) {
         images.push(prevProduct.thumbnail);
-        addToDestroyedImagesList(req, true);
+        markDestroyedImages(req, true);
     }
 
     // Check gallery
     if (gallery)
         prevProduct.gallery?.forEach((image) => {
             const exists = gallery.some(
-                ({ name }) => decodeURIComponent(name) === image
+                (file) => getDecodedName(file) === image
             );
             if (exists) return;
             images.push(image);
-            addToDestroyedImagesList(req, image);
+            markDestroyedImages(req, image);
         });
     // If no new gallery is provided, destroy all previous gallery images and add them to destroyedImages list
     else {
         prevProduct.gallery?.forEach((image) => images.push(image));
-        addToDestroyedImagesList(req, prevProduct.gallery as string[]);
+        markDestroyedImages(req, prevProduct.gallery as string[]);
     }
 
     return images;
@@ -117,12 +116,10 @@ const imageDestroyer: (
                 .status(404)
                 .send(`Product with id #${id} doesn't exists!`);
 
-        const thumbnail = req.files?.thumbnail as
-            | fileUpload.UploadedFile
-            | undefined;
+        const thumbnail = req.files?.thumbnail as UploadedFile | undefined;
         let gallery = req.files?.gallery as
-            | fileUpload.UploadedFile[]
-            | fileUpload.UploadedFile
+            | UploadedFile[]
+            | UploadedFile
             | undefined;
 
         if (!thumbnail && action === "edit")
