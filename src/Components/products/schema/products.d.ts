@@ -9,6 +9,7 @@ export default interface IProduct extends Document {
     salePrice?: number;
     thumbnail: string;
     gallery?: string[];
+    quantity: number;
     productCategory: Types.ObjectId;
     attrs: IProductAttr[];
     createdAt: Date;

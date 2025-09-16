@@ -44,6 +44,7 @@ export default <T>(schema: z.ZodType<T>): RequestHandler =>
             }
 
             req.body = result.data as T;
+            console.log("first");
             return next();
         } catch (err) {
             const errors =

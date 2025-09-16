@@ -23,10 +23,12 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
+    console.log("third");
     const newProduct = await productStore.addProduct({
         ...req.body,
         ...req.images,
     });
+    console.log("fourth");
     const error = typeof newProduct === "string";
     return res.status(error ? 500 : 201).send(newProduct);
 };

@@ -33,9 +33,6 @@ const productCategory = z
     .string()
     .refine(checkCategoryExistence, categoryNotFound);
 
-// product base schema
-const price = number();
-
 const attrs = z.preprocess((val) => {
     if (typeof val !== "string") return val;
     try {
@@ -47,7 +44,10 @@ const attrs = z.preprocess((val) => {
 
 const productSchemaBase = {
     title: z.string(),
-    price,
+    price: number(),
+    quantity: number(
+        z.number().nonnegative().int("quantity cannot be flout").optional()
+    ),
     productCategory,
     attrs,
 };
