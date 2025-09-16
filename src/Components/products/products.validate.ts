@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import productCategoryStore from "@P_Category/productCategory.db.js";
 import { attrSchema } from "@P_Category/productCategory.validate.js";
+import productsStatus from "./products.status.js";
 
 // chech category funtionality
 type CheckCategory = (id: string) => Promise<boolean>;
@@ -14,9 +15,16 @@ const checkCategoryExistence: CheckCategory = async (id) => {
     return !!exists;
 };
 
+// number schema for formdata
+const number = (schema: z.core.SomeType = z.number().positive()) =>
+    z.preprocess((val) => {
+        const num = Number(val);
+        return num || undefined;
+    }, schema);
+
 // category not found message
 const categoryNotFound = {
-    message: "Category not found",
+    error: "Category not found",
     path: ["productCategory"],
 };
 
@@ -26,10 +34,7 @@ const productCategory = z
     .refine(checkCategoryExistence, categoryNotFound);
 
 // product base schema
-const price = z.preprocess((val) => {
-    const num = Number(val);
-    return num || undefined;
-}, z.number().positive());
+const price = number();
 
 const attrs = z.preprocess((val) => {
     if (typeof val !== "string") return val;
@@ -50,3 +55,21 @@ const productSchemaBase = {
 // post product schema
 export const postProductSchema = z.object(productSchemaBase);
 export type PostProductSchema = z.infer<typeof postProductSchema>;
+
+// edit product schema
+export const editProductSchema = z.object({
+    ...productSchemaBase,
+    salePrice: number(),
+    status: number(
+        z
+            .number()
+            .refine(
+                (value) => Object.values(productsStatus).includes(value as any),
+                {
+                    path: ["status"],
+                    error: "Product Status is invalid",
+                }
+            )
+    ),
+});
+export type EditProductSchema = z.infer<typeof editProductSchema>;

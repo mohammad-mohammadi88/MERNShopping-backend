@@ -28,8 +28,8 @@ const postProductCTRL: RequestHandler<
 };
 export const postProductHandler: any[] = [
     fileUpload(),
-    imageResize,
     validateAsync(postProductSchema),
+    imageResize,
     postProductCTRL,
 ];
 

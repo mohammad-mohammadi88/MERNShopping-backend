@@ -6,6 +6,5 @@ yarn.lock
 
 pnpm.yaml
 
-.git
-
 build
+dist

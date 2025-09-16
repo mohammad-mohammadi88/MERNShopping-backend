@@ -4,7 +4,6 @@ import { z } from "zod";
 export default <T>(schema: z.ZodType<T>): RequestHandler =>
     async (req, res, next) => {
         z.setErrorMap((issue) => {
-            console.log(issue);
             switch (issue.code) {
                 case "invalid_type":
                     return {

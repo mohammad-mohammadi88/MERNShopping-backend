@@ -6,10 +6,7 @@ const deleteImage = async (public_id: string): Promise<DeleteApiResponse> =>
             await cloudinary.uploader.destroy(
                 public_id,
                 undefined,
-                (error, result) => {
-                    if (result) resolve(result);
-                    else reject(error);
-                }
+                (error, result) => (result ? resolve(result) : reject(error))
             )
     );
 
