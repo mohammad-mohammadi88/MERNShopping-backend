@@ -18,7 +18,7 @@ const checkCategoryExistence: CheckCategory = async (id) => {
 const number = (schema: z.core.SomeType = z.number().positive()) =>
     z.preprocess((val) => {
         const num = Number(val);
-        return num || undefined;
+        return isNaN(num) ? undefined : num;
     }, schema);
 
 // product attribute schema

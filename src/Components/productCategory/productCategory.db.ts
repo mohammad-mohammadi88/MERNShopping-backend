@@ -30,7 +30,7 @@ class ProductCategoryStore {
                 ProductCategoryModel.findOneAndUpdate(
                     {
                         _id,
-                        totalProducts: { $gt: 0 },
+                        totalProducts: { $gt: action === "increase" ? -1 : 0 },
                     },
                     {
                         $inc: {

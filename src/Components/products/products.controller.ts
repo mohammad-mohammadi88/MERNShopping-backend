@@ -26,18 +26,18 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
+    const { status: categoryStatus, error: categoryError } =
+        // default action is increase
+        await productCategoryStore.changeProductCount(
+            req.body.productCategory as unknown as string
+        );
+    if (categoryError) return res.status(categoryStatus).send(categoryError);
+
     const { status, data, error } = await productStore.addProduct({
         ...req.body,
         ...req.images,
     });
     if (error) return res.status(status).send(error);
-
-    const { status: categoryStatus, error: categoryError } =
-        // default action is increase
-        await productCategoryStore.changeProductCount(
-            data?.productCategory as unknown as string
-        );
-    if (categoryError) return res.status(categoryStatus).send(categoryError);
 
     return res.status(status).send(data);
 };
