@@ -21,15 +21,48 @@ class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(
             () => new ProductModel(data).save(),
-            "creating new product"
+            "creating new product",
+            { successStatus: 201 }
         );
 
     getProductById = (id: string) =>
-        errorHandler(() => ProductModel.findById(id), "getting product by id");
+        errorHandler(() => ProductModel.findById(id), "getting product by id", {
+            notFoundError: `Product with id #${id} not found`,
+        });
 
-    getProducts = (
-        pagination?: Required<Pagination>
-    ): Promise<string | GetProducts> =>
+    orderProduct = (_id: string) =>
+        errorHandler(
+            () =>
+                ProductModel.findOneAndUpdate(
+                    {
+                        _id,
+                        quantity: { $gt: 0 },
+                    },
+                    { $inc: { quantity: -1 } },
+                    { new: true }
+                ),
+
+            `ordering product with id #${_id}`,
+            {
+                notFoundError: "You are not able to order this product",
+            }
+        );
+
+    storeProduct = (id: string) =>
+        errorHandler(
+            async () =>
+                await ProductModel.findByIdAndUpdate(
+                    id,
+                    { $inc: { quantity: 1 } },
+                    { new: true }
+                ),
+            `storing product with id #${id}`,
+            {
+                notFoundError: `Product with id #${id} not found`,
+            }
+        );
+
+    getProducts = (pagination?: Required<Pagination>) =>
         errorHandler(async (): Promise<GetProducts> => {
             const result = ProductModel.find();
             const totalDocs = await ProductModel.countDocuments();
@@ -55,13 +88,15 @@ class ProductStore {
     editProduct = (id: string, data: EditProductSchema & Images) =>
         errorHandler(
             () => ProductModel.findByIdAndUpdate(id, data),
-            "editing product"
+            "editing product",
+            { notFoundError: `Product with id #${id} not found` }
         );
 
     deleteProduct = (id: string) =>
         errorHandler(
             () => ProductModel.findByIdAndDelete(id),
-            "deleting product"
+            "deleting product",
+            { notFoundError: `Product with id #${id} not found` }
         );
 }
 

@@ -14,8 +14,10 @@ const postCategoryCTRL: RequestHandler<
     string | IProductCategory,
     PostCategorySchema
 > = async (req, res) => {
-    const category = await productCategoryStore.addCategory(req.body);
-    return res.status(typeof category === "string" ? 500 : 201).send(category);
+    const { status, data, error } = await productCategoryStore.addCategory(
+        req.body
+    );
+    return res.status(status).send(error || data);
 };
 
 export const postCategoryHandler: any[] = [
@@ -28,10 +30,8 @@ export const getCategoriesHandler: RequestHandler<
     null,
     string | IProductCategory[]
 > = async (_, res) => {
-    const categories = await productCategoryStore.getCategories();
-    return res
-        .status(typeof categories === "string" ? 500 : 200)
-        .send(categories);
+    const { status, data, error } = await productCategoryStore.getCategories();
+    return res.status(status).send(error || data);
 };
 
 // get category by id
@@ -40,10 +40,8 @@ export const getCategoryByIdHandler: RequestHandler<
     string | IProductCategory
 > = async (req, res) => {
     const id = req.params.id;
-    const category = await productCategoryStore.getCategoryById(id);
-    const isNull = category === null;
-
-    return res
-        .status(typeof category === "string" ? 500 : isNull ? 404 : 200)
-        .send(category ?? `Category with id #${id} doesn't exists!`);
+    const { status, data, error } = await productCategoryStore.getCategoryById(
+        id
+    );
+    return res.status(status).send(error || data);
 };

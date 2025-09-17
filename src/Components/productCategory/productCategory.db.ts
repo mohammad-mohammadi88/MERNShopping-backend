@@ -6,7 +6,8 @@ class ProductCategoryStore {
     addCategory = (body: PostCategorySchema) =>
         errorHandler(
             () => new ProductCategoryModel(body).save(),
-            "creating new category"
+            "creating new category",
+            { successStatus: 201 }
         );
 
     getCategories = () =>
@@ -15,7 +16,8 @@ class ProductCategoryStore {
     getCategoryById = (id: string) =>
         errorHandler(
             () => ProductCategoryModel.findById(id),
-            "getting category by id"
+            "getting category by id",
+            { notFoundError: `Category with id #${id} not found` }
         );
 }
 

@@ -1,9 +1,11 @@
 import type { RequestHandler } from "express";
-
-import imageDestroyer from "@/middlewares/imageDestroyer.js";
-import imageResize from "@/middlewares/imageResize.js";
-import validateAsync from "@/middlewares/validateAsync.js";
 import fileUpload from "express-fileupload";
+
+import {
+    imageDestroyer,
+    imageResize,
+    validateAsync,
+} from "@/middlewares/index.js";
 import productStore, {
     type GetProducts,
     type Pagination,
@@ -23,12 +25,11 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
-    const newProduct = await productStore.addProduct({
+    const { status, data, error } = await productStore.addProduct({
         ...req.body,
         ...req.images,
     });
-    const error = typeof newProduct === "string";
-    return res.status(error ? 500 : 201).send(newProduct);
+    return res.status(status).send(error || data);
 };
 export const postProductHandler: any[] = [
     fileUpload(),
@@ -52,9 +53,8 @@ export const getAllProductsHandler: RequestHandler<
     if (check(pagination.page) || check(pagination.perPage))
         pagination = undefined;
 
-    const products = await productStore.getProducts(pagination);
-    const error = typeof products === "string";
-    return res.status(error ? 500 : 200).send(products);
+    const { status, data, error } = await productStore.getProducts(pagination);
+    return res.status(status).send(error || data);
 };
 
 // Get Product By Id
@@ -63,11 +63,8 @@ export const getProductByIdHandler: RequestHandler<
     string | IProduct
 > = async (req, res) => {
     const id = req.params.id;
-    const product = await productStore.getProductById(id);
-    const error = typeof product === "string";
-    return res
-        .status(error ? 500 : !product ? 404 : 200)
-        .send(product ?? `Product with id #${id} doesn't exists!`);
+    const { status, data, error } = await productStore.getProductById(id);
+    return res.status(status).send(error || data);
 };
 
 // edit Product By Id
@@ -76,14 +73,14 @@ const editProductByIdCTRL: RequestHandler<
     string | IProduct,
     EditProductSchema
 > = async (req, res) => {
-    const editedProduct = await productStore.editProduct(req.params.id, {
-        ...req.body,
-        ...req.images,
-    });
-    // because of imageDestroyer middleware will are sure that the product already exists
-    if (editedProduct === null) return;
-    const error = typeof editedProduct === "string";
-    return res.status(error ? 500 : 200).send(editedProduct);
+    const { status, data, error } = await productStore.editProduct(
+        req.params.id,
+        {
+            ...req.body,
+            ...req.images,
+        }
+    );
+    return res.status(status).send(error || data);
 };
 export const editProductByIdHandler: any[] = [
     fileUpload(),
@@ -94,17 +91,14 @@ export const editProductByIdHandler: any[] = [
 ];
 
 // delete product by id
-const deleteProductByIdCTRL: RequestHandler<ParamID, string> = async (
-    req,
-    res
-) => {
-    const id = req.params.id;
-    const deletedProduct = await productStore.deleteProduct(id);
-    // because of imageDestroyer middleware will are sure that the product already exists
-    if (deletedProduct === null) return;
-    if (typeof deletedProduct === "string")
-        return res.status(500).send(deletedProduct);
-    return res.status(200).send(`Product with id #${id} deleted successfully`);
+const deleteProductByIdCTRL: RequestHandler<
+    ParamID,
+    string | IProduct
+> = async (req, res) => {
+    const { status, data, error } = await productStore.deleteProduct(
+        req.params.id
+    );
+    return res.status(status).send(error || data);
 };
 export const deleteProductByIdHandler: any[] = [
     imageDestroyer("delete"),
