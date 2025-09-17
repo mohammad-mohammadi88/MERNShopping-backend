@@ -106,15 +106,16 @@ const imageDestroyer: (
         const id = req.params.id;
 
         // Get previous product
-        const prevProduct = await productStore.getProductById(id);
+        const {
+            status,
+            data: prevProduct,
+            error,
+        } = await productStore.getProductById(id);
 
-        if (typeof prevProduct === "string")
-            return res.status(500).send(prevProduct);
+        if (error) return res.status(status).send(error);
 
-        if (prevProduct === null)
-            return res
-                .status(404)
-                .send(`Product with id #${id} doesn't exists!`);
+        // this code will never return
+        if (!prevProduct) return;
 
         const thumbnail = req.files?.thumbnail as UploadedFile | undefined;
         let gallery = req.files?.gallery as

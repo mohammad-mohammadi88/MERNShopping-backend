@@ -6,6 +6,7 @@ import {
     imageResize,
     validateAsync,
 } from "@/middlewares/index.js";
+import productCategoryStore from "../productCategory/productCategory.db.js";
 import productStore, {
     type GetProducts,
     type Pagination,
@@ -29,7 +30,16 @@ const postProductCTRL: RequestHandler<
         ...req.body,
         ...req.images,
     });
-    return res.status(status).send(error || data);
+    if (error) return res.status(status).send(error);
+
+    const { status: categoryStatus, error: categoryError } =
+        // default action is increase
+        await productCategoryStore.changeProductCount(
+            data?.productCategory as unknown as string
+        );
+    if (categoryError) return res.status(categoryStatus).send(categoryError);
+
+    return res.status(status).send(data);
 };
 export const postProductHandler: any[] = [
     fileUpload(),
@@ -95,10 +105,20 @@ const deleteProductByIdCTRL: RequestHandler<
     ParamID,
     string | IProduct
 > = async (req, res) => {
-    const { status, data, error } = await productStore.deleteProduct(
-        req.params.id
-    );
-    return res.status(status).send(error || data);
+    const id = req.params.id;
+    const { status, error, data } = await productStore.deleteProduct(id);
+    if (error) return res.status(status).send(error);
+
+    const { status: categoryStatus, error: categoryError } =
+        await productCategoryStore.changeProductCount(
+            data?.productCategory as unknown as string,
+            "decrease"
+        );
+    if (categoryError) return res.status(categoryStatus).send(categoryError);
+
+    return res
+        .status(status)
+        .send(`Product with id #${id} deleted successfully`);
 };
 export const deleteProductByIdHandler: any[] = [
     imageDestroyer("delete"),
