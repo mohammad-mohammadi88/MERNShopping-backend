@@ -27,7 +27,11 @@ export default <T>(schema: z.ZodType<T>): RequestHandler =>
         if (!result.success)
             return res
                 .status(400)
-                .json({ errors: result.error.issues.map((e) => e.message) });
+                .json({
+                    errors: result.error.issues
+                        .map((e) => e.message)
+                        .filter((e) => e),
+                });
 
         req.body = result.data as T;
         next();

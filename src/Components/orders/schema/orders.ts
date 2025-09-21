@@ -1,23 +1,32 @@
 import { Schema } from "mongoose";
 
-import userAddressSchema from "@Users/schema/users.address.js";
-import UserModel from "@Users/model/users.model.js";
-import ordersStatus from "../orders.status.js";
 import refrence from "@/shared/refrence.js";
+import UserModel from "@Users/model/users.model.js";
+import userAddressSchema from "@Users/schema/users.address.js";
+import ordersStatus from "../orders.status.js";
+import orderProductSchema from "./order.product.js";
 import type OrderType from "./orders.d.js";
 
 const statusType = {
     type: Number,
     required: true,
     enum: Object.values(ordersStatus),
-    default: ordersStatus.PENDING,
+    default: ordersStatus.INIT,
 };
 const orderSchema: Schema<OrderType> = new Schema(
     {
         finalPrice: { type: Number, required: true },
         totalPrice: { type: Number, required: true },
-        coupon: refrence("Coupon"),
+        coupon: refrence("Coupon", false),
         userId: refrence("User"),
+        products: {
+            type: [orderProductSchema],
+            required: true,
+            validate: {
+                validator: (v: unknown[]) => Array.isArray(v) && v.length > 0,
+                message: "Order must have at least one product",
+            },
+        },
         status: statusType,
         deliveryAddress: { type: userAddressSchema },
     },
@@ -26,8 +35,7 @@ const orderSchema: Schema<OrderType> = new Schema(
 orderSchema.pre("validate", async function (next) {
     if (!this.deliveryAddress) {
         const user = await UserModel.findById(this.userId).lean();
-        // @ts-ignore
-        this.addresses =
+        this.deliveryAddress =
             user && user.addresses.length > 0 ? user.addresses[0] : null;
     }
     next();

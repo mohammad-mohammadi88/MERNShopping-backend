@@ -1,7 +1,16 @@
 import { Schema } from "mongoose";
 
-export default (ref: string) => ({
+export type Collections =
+    | "User"
+    | "Product"
+    | "Coupon"
+    | "Order"
+    | "ProductCategory"
+    | "ProductOffer";
+
+export default (ref: Collections, required = true, options?: object) => ({
     type: Schema.Types.ObjectId,
-    required: true,
+    required,
     ref,
+    ...options,
 });

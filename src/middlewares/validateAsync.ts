@@ -39,21 +39,24 @@ export default <T>(schema: z.ZodType<T>): RequestHandler =>
                         issue.message.toLowerCase().includes("not found")
                 );
                 return res.status(isNotFound ? 404 : 400).json({
-                    errors: result.error.issues.map((e) => e.message),
+                    errors: result.error.issues
+                        .map((e) => e.message)
+                        .filter(String),
                 });
             }
 
             req.body = result.data as T;
             return next();
         } catch (err) {
-            const errors =
+            const errors: string[] =
                 typeof err === "string"
                     ? [err]
                     : err instanceof Error
-                    ? err.message
+                    ? [err.message]
                     : err instanceof z.ZodError
                     ? err.issues.map((e) => e.message)
                     : ["Unexpected error happend while validating data"];
-            return res.status(500).send({ errors });
+
+            return res.status(500).send({ errors: errors.filter(String) });
         }
     };

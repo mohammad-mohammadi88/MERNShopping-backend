@@ -1,13 +1,14 @@
 import type { Document, Types } from "mongoose";
 
-import ordersStatus from "../orders.status.ts";
 import type IUserAddress from "@Users/schema/users.address";
+import ordersStatus from "../orders.status.ts";
+import type IOrderProduct from "./order.product.d.js";
 
 export default interface IOrder extends Document {
     totalPrice: number;
-    products: Types.ObjectId[];
+    products: IOrderProduct[];
     finalPrice: number;
-    coupon: Types.ObjectId;
+    coupon?: Types.ObjectId;
     userId: Types.ObjectId;
     deliveryAddress: IUserAddress;
     createdAt: Date;

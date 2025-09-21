@@ -6,7 +6,7 @@ type ChangeProductCountAction = "increase" | "decrease";
 class ProductCategoryStore {
     addCategory = (body: PostCategorySchema) =>
         errorHandler(
-            () => new ProductCategoryModel(body).save(),
+            () => ProductCategoryModel.create(body),
             "creating new category",
             { successStatus: 201 }
         );

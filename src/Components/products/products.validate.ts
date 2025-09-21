@@ -1,5 +1,5 @@
 import { z } from "zod";
-///^#(?:[0-9a-fA-F]{3}){1,2}$/
+
 import productCategoryStore from "@P_Category/productCategory.db.js";
 import productsStatus from "./products.status.js";
 

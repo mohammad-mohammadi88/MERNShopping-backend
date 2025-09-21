@@ -19,11 +19,9 @@ export interface Pagination {
 }
 class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
-        errorHandler(
-            () => new ProductModel(data).save(),
-            "creating new product",
-            { successStatus: 201 }
-        );
+        errorHandler(() => ProductModel.create(data), "creating new product", {
+            successStatus: 201,
+        });
 
     getProductById = (id: string) =>
         errorHandler(() => ProductModel.findById(id), "getting product by id", {

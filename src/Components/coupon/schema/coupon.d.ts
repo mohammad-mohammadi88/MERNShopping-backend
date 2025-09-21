@@ -1,12 +1,15 @@
 import { Document, Types } from "mongoose";
-import couponStatus from "../coupon.status";
 
-interface Constraints {
+import couponStatus from "../coupon.status.js";
+import type { Discount } from "../coupon.validate.ts";
+
+export interface Constraints {
     user: Types.ObjectId;
 }
+
 export default interface ICoupon extends Document {
-    code: string;
-    amount: number;
+    code: Types.UUID;
+    discount: Discount;
     limit: number;
     used: number;
     expiresAt: Date;
