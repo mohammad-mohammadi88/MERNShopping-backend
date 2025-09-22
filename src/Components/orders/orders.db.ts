@@ -12,9 +12,16 @@ class OrdersStore {
             successStatus: 201,
         });
 
+    getOrdersCount = () =>
+        errorHandler(() => OrderModel.countDocuments(), "getting orders count");
+
     getAllOrders = (status?: number) =>
         errorHandler(
-            () => OrderModel.find(status ? { status } : {}),
+            () =>
+                OrderModel.find(status ? { status } : {}).populate([
+                    "userId",
+                    "products.productID",
+                ]),
             "getting all orders"
         );
 

@@ -17,6 +17,7 @@ export interface Pagination {
     perPage?: number;
     page?: number;
 }
+type ChagneProductQuantity = "increase" | "decrease";
 class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => ProductModel.create(data), "creating new product", {
@@ -28,37 +29,26 @@ class ProductStore {
             notFoundError: `Product with id #${id} not found`,
         });
 
-    orderProduct = (_id: string) =>
-        errorHandler(
-            () =>
-                ProductModel.findOneAndUpdate(
+    changeProductQuantity = (_id: string, quantityEffect: number) => {
+        const action = quantityEffect > 0 ? "increas" : "decreas";
+        return errorHandler(
+            async () =>
+                await ProductModel.findOneAndUpdate(
                     {
                         _id,
-                        quantity: { $gt: 0 },
+                        quantity:
+                            quantityEffect > 0
+                                ? {}
+                                : { $gte: Math.abs(quantityEffect) },
                     },
-                    { $inc: { quantity: -1 } },
-                    { new: true }
+                    { $inc: { quantity: quantityEffect } }
                 ),
-
-            `ordering product with id #${_id}`,
+            `${action}ing product quantity with id #${_id}`,
             {
-                notFoundError: "You are not able to order this product",
+                notFoundError: `Unable to ${action}e product with id #${_id} quantity`,
             }
         );
-
-    storeProduct = (id: string) =>
-        errorHandler(
-            async () =>
-                await ProductModel.findByIdAndUpdate(
-                    id,
-                    { $inc: { quantity: 1 } },
-                    { new: true }
-                ),
-            `storing product with id #${id}`,
-            {
-                notFoundError: `Product with id #${id} not found`,
-            }
-        );
+    };
 
     getProducts = (pagination?: Required<Pagination>) =>
         errorHandler(async (): Promise<GetProducts> => {

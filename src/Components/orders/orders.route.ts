@@ -4,6 +4,7 @@ import {
     editOrderStatusHandler,
     getAllOrdersHandler,
     getOrderByIdHandler,
+    getOrdersCountHandler,
     postNewOrderHandler,
 } from "./orders.controller.js";
 
@@ -11,6 +12,7 @@ const router = express.Router();
 
 router.post("/", postNewOrderHandler);
 router.get("/", getAllOrdersHandler);
+router.get("/count", getOrdersCountHandler);
 router.get("/:id", getOrderByIdHandler);
 router.patch("/:id", editOrderStatusHandler);
 

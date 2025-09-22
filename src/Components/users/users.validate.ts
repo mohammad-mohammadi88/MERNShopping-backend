@@ -1,7 +1,6 @@
 import z from "zod";
 
 export const userAddressSchema = z.object({
-    fullname: z.string(),
     title: z.string(),
     address: z.string(),
     state: z.string(),

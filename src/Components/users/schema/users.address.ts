@@ -2,7 +2,6 @@ import { Schema } from "mongoose";
 import type IUser from "./users.address.d.js";
 
 const userAddressSchema: Schema<IUser> = new Schema({
-    fullname: { type: String, required: true },
     title: { type: String, required: true },
     address: { type: String, required: true },
     state: { type: String, required: true },

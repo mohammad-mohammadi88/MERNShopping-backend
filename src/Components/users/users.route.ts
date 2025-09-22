@@ -22,7 +22,6 @@ router.post("/", async (req, res) => {
         state: "urmia",
         city: "urmia",
         mobile,
-        fullName: `${firstName} ${lastName}`,
         address: "iran urmia",
         zipCode: "142415611",
     });

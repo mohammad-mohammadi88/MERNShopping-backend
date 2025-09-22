@@ -1,6 +1,7 @@
 import validate from "@/middlewares/validate.js";
 import type { RequestHandler } from "express";
 import couponStore from "../coupon/coupon.db.js";
+import productStore from "../products/products.db.js";
 import ordersStore from "./orders.db.js";
 import ordersStatus from "./orders.status.js";
 import {
@@ -53,7 +54,20 @@ const postNewOrderCTRL: RequestHandler<
         totalPrice,
         finalPrice,
     };
+
+    // decrease ordered products count
+    const productsPromise = products.map(async ({ productID, count }) => {
+        const { status: productStatus, error: productError } =
+            await productStore.changeProductQuantity(
+                productID,
+                (count || 1) * -1
+            );
+        if (productError) throw res.status(productStatus).send(productError);
+    });
+    await Promise.all(productsPromise);
+
     const { status, data, error } = await ordersStore.postOrder(newOrder);
+
     return res.status(status).send(data || error);
 };
 export const postNewOrderHandler: any[] = [
@@ -80,6 +94,15 @@ export const getOrderByIdHandler: RequestHandler<
     string | IOrder
 > = async (req, res) => {
     const { status, data, error } = await ordersStore.getOrder(req.params.id);
+    return res.status(status).send(data || error);
+};
+
+// get orders count
+export const getOrdersCountHandler: RequestHandler<
+    null,
+    string | number
+> = async (_, res) => {
+    const { status, data, error } = await ordersStore.getOrdersCount();
     return res.status(status).send(data || error);
 };
 
