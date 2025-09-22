@@ -36,10 +36,12 @@ class ProductStore {
                 await ProductModel.findOneAndUpdate(
                     {
                         _id,
-                        quantity:
-                            quantityEffect > 0
-                                ? {}
-                                : { $gte: Math.abs(quantityEffect) },
+                        quantity: {
+                            $gte:
+                                quantityEffect > 0
+                                    ? -1
+                                    : Math.abs(quantityEffect),
+                        },
                     },
                     { $inc: { quantity: quantityEffect } }
                 ),

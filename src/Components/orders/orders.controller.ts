@@ -126,7 +126,7 @@ const editOrderStatusCTRL: RequestHandler<
     if (prevOrder?.status >= status)
         return res
             .status(406)
-            .send("You cannot change the status to previous states");
+            .send("You cannot change the status to previous status");
 
     if (
         prevOrder?.status === ordersStatus.RECEIVED ||
@@ -134,6 +134,20 @@ const editOrderStatusCTRL: RequestHandler<
     ) {
         const orderStatusError = `Received = ${ordersStatus.RECEIVED} and Cenceled = ${ordersStatus.CANCELED} order statuses are not editable`;
         return res.status(406).send(orderStatusError);
+    }
+
+    // increase product quantity if order canceled
+    if (status === ordersStatus.CANCELED) {
+        const productsPromise = prevOrder.products.map(async (product) => {
+            const { status: productStatus, error: productError } =
+                await productStore.changeProductQuantity(
+                    product.productID,
+                    product.count
+                );
+            if (productError)
+                throw res.status(productStatus).send(productError);
+        });
+        await Promise.all(productsPromise);
     }
 
     const {
