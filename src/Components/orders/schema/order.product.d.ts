@@ -1,9 +1,9 @@
 import type { Document, Types } from "mongoose";
 
-import type IProductColor from "@Products/schema/product.color.d.js";
+import type { OrderProductSchema } from "../orders.validate.ts";
 
-export default interface IOrderProduct extends Document {
-    color?: null | IProductColor;
-    productID: Types.ObjectId;
-    count: number;
-}
+type IOrderProduct = OrderProductSchema &
+    Document & {
+        productID: Types.ObjectId;
+    };
+export default IOrderProduct;

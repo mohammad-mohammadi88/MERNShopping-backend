@@ -1,11 +1,5 @@
 import type { Document } from "mongoose";
+import type { UserAddressSchema } from "../users.validate.ts";
 
-export default interface IUserAddress extends Document {
-    title: string;
-    state: string;
-    city: string;
-    mobile: string;
-    address: string;
-    zipCode?: string;
-    fullName: string;
-}
+type IUserAddress = UserAddressSchema & Document;
+export default IUserAddress;

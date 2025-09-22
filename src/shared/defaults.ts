@@ -2,6 +2,7 @@ import "dotenv/config";
 export default {
     cloudinaryFolder: "mernShopping",
     maxGalleryLength: 3,
+    couponCodeLength: 16,
     port: Number(process.env.PORT!),
     databaseUrl: process.env.DATABASE_URL!,
     redis: {

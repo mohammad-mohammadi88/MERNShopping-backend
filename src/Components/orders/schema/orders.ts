@@ -5,7 +5,7 @@ import UserModel from "@Users/model/users.model.js";
 import userAddressSchema from "@Users/schema/users.address.js";
 import ordersStatus from "../orders.status.js";
 import orderProductSchema from "./order.product.js";
-import type OrderType from "./orders.d.js";
+import type IOrder from "./orders.d.js";
 
 const statusType = {
     type: Number,
@@ -13,11 +13,11 @@ const statusType = {
     enum: Object.values(ordersStatus),
     default: ordersStatus.INIT,
 };
-const orderSchema: Schema<OrderType> = new Schema(
+const orderSchema: Schema<IOrder> = new Schema(
     {
         finalPrice: { type: Number, required: true },
         totalPrice: { type: Number, required: true },
-        coupon: refrence("Coupon", false),
+        couponCode: { type: String, required: false },
         userId: refrence("User"),
         products: {
             type: [orderProductSchema],

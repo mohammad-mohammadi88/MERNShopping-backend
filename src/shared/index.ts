@@ -1,3 +1,4 @@
+export { default as capitalize } from "./capitalize.js";
 export { default as defaults } from "./defaults.js";
 export { default as getDecodedName } from "./getDecodedName.js";
 export { default as mongooseConnection } from "./mongoose.connection.js";

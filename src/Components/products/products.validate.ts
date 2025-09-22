@@ -6,8 +6,6 @@ import productsStatus from "./products.status.js";
 // chech category funtionality
 type CheckCategory = (id: string) => Promise<boolean>;
 const checkCategoryExistence: CheckCategory = async (id) => {
-    if (id.length !== 24) throw "productCategory must be 24 characters long";
-
     const exists = await productCategoryStore.getCategoryById(id);
     if (typeof exists === "string") throw exists;
 
@@ -28,11 +26,16 @@ const attrSchema = z.object({
 });
 
 // product color schema
-const colorSchema = z.object({
-    title: z.string(),
-    color: z.string().regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, "Invalid hex color"),
-    priceEffect: number(z.number().nonnegative().optional()),
-});
+export const productColorSchema = (
+    priceEffect: any = number(z.number().nonnegative().optional())
+) =>
+    z.object({
+        title: z.string(),
+        color: z
+            .string()
+            .regex(/^#(?:[0-9a-fA-F]{3}){1,2}$/, "Invalid hex color"),
+        priceEffect,
+    });
 
 // category not found message
 const categoryNotFound = {
@@ -43,6 +46,7 @@ const categoryNotFound = {
 // product category field validation
 const productCategory = z
     .string()
+    .length(24, "productCategory can only be 24 characters")
     .refine(checkCategoryExistence, categoryNotFound);
 
 const array = (schema: z.core.SomeType) =>
@@ -63,7 +67,7 @@ const productSchemaBase = {
     ),
     productCategory,
     attrs: array(z.array(attrSchema).optional()),
-    colors: array(z.array(colorSchema).optional()),
+    colors: array(z.array(productColorSchema()).optional()),
 };
 
 // post product schema

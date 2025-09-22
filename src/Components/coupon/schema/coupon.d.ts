@@ -8,7 +8,7 @@ export interface Constraints {
 }
 
 export default interface ICoupon extends Document {
-    code: Types.UUID;
+    code: string;
     discount: Discount;
     limit: number;
     used: number;

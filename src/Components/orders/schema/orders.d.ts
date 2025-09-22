@@ -1,17 +1,15 @@
 import type { Document, Types } from "mongoose";
 
-import type IUserAddress from "@Users/schema/users.address";
 import ordersStatus from "../orders.status.ts";
-import type IOrderProduct from "./order.product.d.js";
+import type { PostOrderSchema } from "../orders.validate.ts";
 
-export default interface IOrder extends Document {
-    totalPrice: number;
-    products: IOrderProduct[];
-    finalPrice: number;
-    coupon?: Types.ObjectId;
-    userId: Types.ObjectId;
-    deliveryAddress: IUserAddress;
-    createdAt: Date;
-    updatedAt: Date;
-    status: (typeof ordersStatus)[keyof typeof ordersStatus];
-}
+type IOrder = PostOrderSchema &
+    Document & {
+        totalPrice: number;
+        userId: Types.ObjectId;
+        finalPrice: number;
+        createdAt: Date;
+        updatedAt: Date;
+        status: (typeof ordersStatus)[keyof typeof ordersStatus];
+    };
+export default IOrder;

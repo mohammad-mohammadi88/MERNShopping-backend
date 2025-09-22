@@ -1,11 +1,10 @@
 import { z } from "zod";
 import usersStore from "../users/users.db.js";
 
-const roleOptions = ["number", "percent"];
 const discountSchema = z
     .object({
         role: z.enum(
-            roleOptions,
+            ["number", "percent"],
             `discount.role should be one of number or percent`
         ),
         amount: z.number().nonnegative(),
@@ -20,8 +19,6 @@ export type Discount = z.infer<typeof discountSchema>;
 // check user existence
 type CheckUser = (id: string) => Promise<boolean>;
 const checkUserExistence: CheckUser = async (id) => {
-    if (id.length !== 24) throw "user id must be 24 characters long";
-
     const exists = await usersStore.getUserById(id);
     if (typeof exists === "string") throw exists;
 
@@ -35,7 +32,10 @@ const userNotFound = {
 };
 
 const constraintsSchema = z.object({
-    user: z.string().refine(checkUserExistence, userNotFound),
+    user: z
+        .string()
+        .length(24, "user field can only be 24 characters")
+        .refine(checkUserExistence, userNotFound),
 });
 export type Constraints = z.infer<typeof constraintsSchema>;
 
