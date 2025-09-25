@@ -1,14 +1,7 @@
 import { Schema } from "mongoose";
+import type collections from "./collections.js";
 
-export type Collections =
-    | "Coupon"
-    | "Order"
-    | "Payment"
-    | "Product"
-    | "ProductCategory"
-    | "ProductOffer"
-    | "User"
-    | "Comment";
+export type Collections = keyof typeof collections;
 
 export default (ref: Collections, required = true, options?: object) => ({
     type: Schema.Types.ObjectId,
