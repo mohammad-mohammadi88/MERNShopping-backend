@@ -1,56 +1,22 @@
-import type { Request, RequestHandler } from "express";
+import type { RequestHandler } from "express";
 import fileUpload from "express-fileupload";
-import sharp from "sharp";
+import { resolve } from "node:path";
+import { cwd } from "node:process";
+import { Worker } from "node:worker_threads";
 
-import { uploadToCloudinary } from "@/services/cloudinary/index.js";
-import { defaults, getDecodedName } from "@/shared/index.js";
+import type { DestroyedImages, Images } from "@/services/cloudinary/request.js";
+import { defaults } from "@/shared/index.js";
+import type IProduct from "@Products/schema/products.d.js";
 
-// Resize the image to max width of 2000px, compress to 50% quality JPEG,
-// upload to Cloudinary and return the secure_url.
-const resize = async (file: fileUpload.UploadedFile): Promise<string> => {
-    const processedImage = await sharp(file.data)
-        .resize(2000)
-        .jpeg({ quality: 50 })
-        .toBuffer();
-    return (await uploadToCloudinary(processedImage)).secure_url;
-};
+export interface WorkerValues {
+    destroyedImages: DestroyedImages | undefined;
+    action: Action;
+    thumbnail: { name: string; data: Buffer };
+    prevProduct: IProduct | undefined;
+    gallery: { name: string; data: Buffer }[];
+}
 
 type Action = "add" | "edit";
-/**
- * To handle the thumbnail that will be uploaded
- * - Always upload thumbnail while action is adding
- * - Always check if the thumbnail is same as previous product while action is editing
- */
-const handleThumbnail = async (
-    { destroyedImages, prevProduct }: Request,
-    action: Action,
-    thumbnail: fileUpload.UploadedFile
-): Promise<string> =>
-    action === "add" || (action === "edit" && destroyedImages?.thumbnail)
-        ? await resize(thumbnail)
-        : (prevProduct?.thumbnail as string);
-
-/**
- * To handle the gallery images that will be uploaded
- * - Always convert single gallery item to array
- * - Always add upload all gallery images while action is adding
- * - Always check if any of the new gallery item is included in previous product while action is editing
- */
-const handleGallery = async (
-    { destroyedImages }: Request,
-    action: Action,
-    gallery: fileUpload.UploadedFile[]
-): Promise<string[]> =>
-    await Promise.all(
-        gallery.map(async (file) =>
-            action === "add" ||
-            (action === "edit" &&
-                destroyedImages?.gallery.includes(getDecodedName(file)))
-                ? await resize(file)
-                : getDecodedName(file)
-        )
-    );
-
 const imageResize: (action: Action) => RequestHandler =
     (action) => async (req, res, next) => {
         const thumbnail = req.files?.thumbnail as fileUpload.UploadedFile;
@@ -75,12 +41,36 @@ const imageResize: (action: Action) => RequestHandler =
         // convert single gallery item to array
         if (!Array.isArray(gallery)) gallery = [gallery];
 
-        const newImages = {
-            thumbnail: await handleThumbnail(req, action, thumbnail),
-            gallery: await handleGallery(req, action, gallery),
+        const worker = new Worker(resolve(cwd(), "./workers/image.worker.cjs"));
+
+        const { destroyedImages, prevProduct } = req;
+        const workerValues: WorkerValues = {
+            action,
+            destroyedImages,
+            prevProduct,
+            thumbnail: { name: thumbnail.name, data: thumbnail.data },
+            gallery: gallery.map((f) => ({ name: f.name, data: f.data })),
         };
-        req.images = newImages;
-        next();
+
+        worker.postMessage(workerValues, [
+            thumbnail.data.buffer as unknown as ArrayBuffer,
+            ...gallery.map((f) => f.data.buffer as unknown as ArrayBuffer),
+        ]);
+        const handleError = ({ message }: Error) => {
+            worker.terminate();
+            return res.status(500).send(message);
+        };
+        worker.on("message", (value: string | Images) => {
+            // error check
+            if (typeof value === "string")
+                return handleError({ message: value, name: "error" });
+
+            worker.terminate();
+            req.images = value;
+            next();
+        });
+        worker.on("error", handleError);
+        worker.on("messageerror", handleError);
     };
 
 export default imageResize;

@@ -1,17 +1,9 @@
+import appRouter from "@/Components/routes.js";
 import { v2 as cloudinary } from "cloudinary";
 import compression from "compression";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
-
-import {
-    couponRouter,
-    ordersRouter,
-    productCategoryRouter,
-    productOffersRouter,
-    productsRouter,
-    usersRouter,
-} from "@/Components/routes.js";
 
 import { defaults, mongooseConnection } from "./shared/index.js";
 
@@ -32,13 +24,7 @@ const app = express();
 
     // routes
     app.get("/healthCheck", (_, res) => res.send("ok"));
-
-    app.use("/categories", productCategoryRouter);
-    app.use("/coupon", couponRouter);
-    app.use("/offers", productOffersRouter);
-    app.use("/orders", ordersRouter);
-    app.use("/products", productsRouter);
-    app.use("/users", usersRouter);
+    app.use(appRouter);
 
     // listen
     app.listen(defaults.port, "0.0.0.0", () =>

@@ -1,10 +1,8 @@
 import type { Request, RequestHandler } from "express";
 import type { UploadedFile } from "express-fileupload";
 
-import {
-    deleteImage,
-    type DestroyedImages,
-} from "@/services/cloudinary/index.js";
+import { deleteImage } from "@/services/cloudinary/index.js";
+import type { DestroyedImages } from "@/services/cloudinary/request.js";
 import { getDecodedName, urlToPublicId } from "@/shared/index.js";
 import productStore from "@Products/products.db.js";
 import type { EditProductSchema } from "@Products/products.validate.js";

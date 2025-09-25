@@ -21,31 +21,18 @@
         "typeRoots": ["./node_modules/@types"],
 
         "paths": {
-            "@/*": [
-                "*"
-            ],
-            "@P_Category/*": [
-                "Components/productCategory/*"
-            ],
-            "@Products/*": [
-                "Components/products/*"
-            ],
-            "@Coupon/*": [
-                "Components/coupon/*"
-            ],
-            "@Users/*": [
-                "Components/users/*"
-            ],
-            "@P_Offers/*": [
-                "Components/productOffers/*"
-            ],
-            "@Orders/*": [
-                "Components/orders/*"
-            ]
+            "@/*": [ "*" ],
+            "@P_Category/*": [ "Components/productCategory/*" ],
+            "@P_Offers/*": [ "Components/productOffers/*" ],
+            "@Products/*": [ "Components/products/*" ],
+            "@Payment/*": [ "Components/payment/*" ],
+            "@Coupon/*": [ "Components/coupon/*" ],
+            "@Orders/*": [ "Components/orders/*" ],
+            "@Users/*": [ "Components/users/*" ]
         }
     },
     "include": [
         "src"
-    ],
+, "worker/image.worker.cjs"    ],
     "exclude": ["node_modules"]
 }
