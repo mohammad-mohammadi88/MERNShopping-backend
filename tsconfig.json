@@ -23,12 +23,12 @@
         "paths": {
             "@/*": [ "*" ],
             "@P_Category/*": [ "Components/productCategory/*" ],
-            "@P_Offers/*": [ "Components/productOffers/*" ],
-            "@Products/*": [ "Components/products/*" ],
+            "@P_Offer/*": [ "Components/productOffer/*" ],
+            "@Product/*": [ "Components/product/*" ],
             "@Payment/*": [ "Components/payment/*" ],
             "@Coupon/*": [ "Components/coupon/*" ],
-            "@Orders/*": [ "Components/orders/*" ],
-            "@Users/*": [ "Components/users/*" ]
+            "@Order/*": [ "Components/order/*" ],
+            "@User/*": [ "Components/user/*" ]
         }
     },
     "include": [

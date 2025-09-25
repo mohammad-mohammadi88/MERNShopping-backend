@@ -1,7 +1,7 @@
 import { Document, Types } from "mongoose";
 
-import couponStatus from "../coupon.status.js";
-import type { Discount } from "../coupon.validate.ts";
+import type { CouponStatusValue } from "../coupon.status.js";
+import type { Discount } from "../coupon.validate.js";
 
 export interface Constraints {
     user: Types.ObjectId;
@@ -14,5 +14,5 @@ export default interface ICoupon extends Document {
     used: number;
     expiresAt: Date;
     constraints: Constraints;
-    status: (typeof couponStatus)[keyof typeof couponStatus];
+    status: CouponStatusValue;
 }

@@ -1,5 +1,6 @@
 import { z } from "zod";
-import usersStore from "../users/users.db.js";
+
+import userStore from "@User/user.store.js";
 
 const discountSchema = z
     .object({
@@ -19,7 +20,7 @@ export type Discount = z.infer<typeof discountSchema>;
 // check user existence
 type CheckUser = (id: string) => Promise<boolean>;
 const checkUserExistence: CheckUser = async (id) => {
-    const exists = await usersStore.getUserById(id);
+    const exists = await userStore.getUserById(id);
     if (typeof exists === "string") throw exists;
 
     return !!exists;

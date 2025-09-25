@@ -2,7 +2,7 @@ import type { RequestHandler } from "express";
 
 import validateAsync from "@/middlewares/validateAsync.js";
 import couponCodeGenerator from "@/services/coupon/couponCodeGenerator.js";
-import couponStore, { type Code } from "./coupon.db.js";
+import couponStore, { type Code } from "./coupon.store.js";
 import { postCouponSchema, type PostCouponSchema } from "./coupon.validate.js";
 import type ICoupon from "./schema/coupon.d.js";
 

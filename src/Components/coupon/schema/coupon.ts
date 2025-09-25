@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-import refrence from "@/shared/refrence.js";
+import { reference, statusSchema } from "@/shared/index.js";
 import couponStatus from "../coupon.status.js";
 import type ICoupon from "./coupon.d.js";
 
@@ -29,15 +29,10 @@ const DiscountSchema = new Schema(
 );
 
 const ConstraintsSchema = new Schema(
-    { user: refrence("User") },
+    { user: reference("User") },
     { _id: false }
 );
 
-const statusType = {
-    type: Number,
-    enum: Object.values(couponStatus),
-    default: couponStatus.ACTIVE,
-};
 const CouponSchema = new Schema<ICoupon>(
     {
         code: { type: String, required: true, unique: true },
@@ -45,7 +40,7 @@ const CouponSchema = new Schema<ICoupon>(
         limit: { type: Number, required: true },
         used: { type: Number, required: true, default: 0 },
         constraints: { type: ConstraintsSchema, required: true },
-        status: statusType,
+        status: statusSchema(couponStatus),
         expiresAt: {
             type: Date,
             required: true,

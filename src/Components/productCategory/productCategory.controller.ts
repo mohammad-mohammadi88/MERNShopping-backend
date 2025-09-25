@@ -1,12 +1,12 @@
 import type { RequestHandler } from "express";
 
 import validate from "@/middlewares/validate.js";
-import productCategoryStore from "./productCategory.db.js";
+import productCategoryStore from "./productCategory.store.js";
 import {
     postCategorySchema,
     type PostCategorySchema,
 } from "./productCategory.validate.js";
-import type IProductCategory from "./schema/product.category.d.js";
+import type IProductCategory from "./schema/productCategory.js";
 
 // post category
 const postCategoryCTRL: RequestHandler<

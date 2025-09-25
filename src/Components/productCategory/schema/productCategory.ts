@@ -1,0 +1,11 @@
+import { Schema } from "mongoose";
+
+import productAttrGroupSchema from "./product.attr.group.js";
+import type IProductCategory from "./productCategory.d.js";
+
+const productCategorySchema: Schema<IProductCategory> = new Schema({
+    title: { type: String, required: true },
+    totalProducts: { type: Number, default: 0 },
+    attrGroups: [productAttrGroupSchema],
+});
+export default productCategorySchema;
