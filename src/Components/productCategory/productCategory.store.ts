@@ -1,8 +1,7 @@
-import errorHandler from "@/shared/errorHandler.js";
+import { type Action, errorHandler } from "@/shared/index.js";
 import ProductCategoryModel from "./productCategory.model.js";
 import type { PostCategorySchema } from "./productCategory.validate.js";
 
-type ChangeProductCountAction = "increase" | "decrease";
 class ProductCategoryStore {
     addCategory = (body: PostCategorySchema) =>
         errorHandler(
@@ -21,20 +20,17 @@ class ProductCategoryStore {
             { notFoundError: `Category with id #${id} not found` }
         );
 
-    changeProductCount = (
-        _id: string,
-        action: ChangeProductCountAction = "increase"
-    ) =>
+    changeProductCount = (_id: string, action: Action = "increas") =>
         errorHandler(
             () =>
                 ProductCategoryModel.findOneAndUpdate(
                     {
                         _id,
-                        totalProducts: { $gt: action === "increase" ? -1 : 0 },
+                        totalProducts: { $gt: action === "increas" ? -1 : 0 },
                     },
                     {
                         $inc: {
-                            totalProducts: action === "increase" ? 1 : -1,
+                            totalProducts: action === "increas" ? 1 : -1,
                         },
                     },
                     { new: true }

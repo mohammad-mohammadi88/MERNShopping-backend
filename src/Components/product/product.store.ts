@@ -17,7 +17,6 @@ export interface Pagination {
     perPage?: number;
     page?: number;
 }
-type ChagneProductQuantity = "increase" | "decrease";
 class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => ProductModel.create(data), "creating new product", {

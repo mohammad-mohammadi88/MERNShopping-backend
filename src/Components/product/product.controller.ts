@@ -101,7 +101,7 @@ const changeProductCounts: ChangeCountFn = async (
     const { status: decreaseStatus, error: decreaseError } =
         await productCategoryStore.changeProductCount(
             prevCategoryId,
-            "decrease"
+            "decreas"
         );
     if (decreaseError) return errorCreator(decreaseStatus, decreaseError);
 
@@ -158,7 +158,7 @@ const deleteProductByIdCTRL: RequestHandler<
     const { status: categoryStatus, error: categoryError } =
         await productCategoryStore.changeProductCount(
             data?.productCategory as unknown as string,
-            "decrease"
+            "decreas"
         );
     if (categoryError) return res.status(categoryStatus).send(categoryError);
 

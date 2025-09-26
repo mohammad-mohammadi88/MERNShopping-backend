@@ -1,10 +1,10 @@
 import type { RequestHandler } from "express";
 
-import couponStore from "@/Components/coupon/coupon.store.js";
-import validate from "@/middlewares/validate.js";
-import validateAsync from "@/middlewares/validateAsync.js";
+import { validate, validateAsync } from "@/middlewares/index.js";
+import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.js";
+import couponStore from "@Coupon/coupon.store.js";
 import productStore from "@Product/product.store.js";
-import userStore from "../user/user.store.js";
+import userStore from "@User/user.store.js";
 import ordersStatus from "./order.status.js";
 import ordersStore from "./order.store.js";
 import {
@@ -47,10 +47,23 @@ const postNewOrderCTRL: RequestHandler<
         // this code will never return
         if (!coupon) return;
 
+        try {
+            const validator = new CouponValidator();
+            validator.handler(req.body.user, coupon);
+        } catch (e: unknown) {
+            const error = (e as Error).message;
+            return res.status(400).send(error);
+        }
+
+        const { status: cStatus, error: cError } =
+            await couponStore.changeCouponUsedTimes(couponCode);
+        if (cError) return res.status(cStatus).send(cError);
+
         const { amount, role } = coupon.discount;
         const discountPrice =
             role === "number" ? amount : calcPercent(finalPrice, amount);
-        finalPrice -= discountPrice;
+
+        finalPrice = Math.max(finalPrice - discountPrice, 0);
     }
     const newOrder = {
         ...req.body,
@@ -144,8 +157,17 @@ const editOrderStatusCTRL: RequestHandler<
         return res.status(406).send(orderStatusError);
     }
 
-    // increase product quantity if order canceled
     if (status === ordersStatus.CANCELED) {
+        // decrease coupon used times if couponCode exists
+        if (prevOrder.couponCode) {
+            const { status: couponStatus, error: couponError } =
+                await couponStore.changeCouponUsedTimes(
+                    prevOrder.couponCode,
+                    "decreas"
+                );
+            return res.status(couponStatus).send(couponError);
+        }
+        // increase product quantity if order canceled
         const productsPromise = prevOrder.products.map(
             async ({ product, count }) => {
                 const { status: productStatus, error: productError } =

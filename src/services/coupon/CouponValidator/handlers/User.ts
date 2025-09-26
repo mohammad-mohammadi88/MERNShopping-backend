@@ -1,11 +1,10 @@
-import AbstractCouponHandler from "../AbstractCouponHandler.js";
 import type ICoupon from "@Coupon/schema/coupon.d.js";
-import type IUser from "@Users/schema/users.d.js";
+import AbstractCouponHandler from "../AbstractCouponHandler.js";
 
 export default class UserHandler extends AbstractCouponHandler {
-    public process = (user: IUser, coupon: ICoupon): ICoupon => {
-        if (coupon.constraints.user !== user._id)
+    public process(userId: string, coupon: ICoupon): ICoupon {
+        if (coupon.constraints.user.toJSON() !== userId)
             throw new Error("You cannot use another ones coupon");
-        return super["process"](user, coupon);
-    };
+        return super.process(userId, coupon);
+    }
 }

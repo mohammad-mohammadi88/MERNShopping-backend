@@ -1,7 +1,6 @@
-import errorHandler from "@/shared/errorHandler.js";
+import { type Action, errorHandler } from "@/shared/index.js";
 import userModel from "./user.model.js";
 
-type Action = "increase" | "decrease";
 class UserStore {
     getAllUsers = () =>
         errorHandler(() => userModel.find(), "getting users list");
@@ -16,16 +15,16 @@ class UserStore {
             notFoundError: `User with id #${id} not found`,
         });
 
-    changeTotalOrdersCount = (_id: string, action: Action = "increase") =>
+    changeTotalOrdersCount = (_id: string, action: Action = "increas") =>
         errorHandler(
             () =>
                 userModel.findOneAndUpdate(
                     {
                         _id,
-                        totalOrders: { $gt: action === "increase" ? -1 : 0 },
+                        totalOrders: { $gt: action === "increas" ? -1 : 0 },
                     },
                     {
-                        $inc: { totalOrders: action === "increase" ? 1 : -1 },
+                        $inc: { totalOrders: action === "increas" ? 1 : -1 },
                     }
                 ),
             `${action}ing totalOrders count`,

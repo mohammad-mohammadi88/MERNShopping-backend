@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import userStore from "@User/user.store.js";
+import { userSchema } from "@/shared/schema.js";
 
 const discountSchema = z
     .object({
@@ -17,26 +17,8 @@ const discountSchema = z
 
 export type Discount = z.infer<typeof discountSchema>;
 
-// check user existence
-type CheckUser = (id: string) => Promise<boolean>;
-const checkUserExistence: CheckUser = async (id) => {
-    const exists = await userStore.getUserById(id);
-    if (typeof exists === "string") throw exists;
-
-    return !!exists;
-};
-
-// user not found message
-const userNotFound = {
-    error: "User not found",
-    path: ["productUser"],
-};
-
 const constraintsSchema = z.object({
-    user: z
-        .string()
-        .length(24, "user field can only be 24 characters")
-        .refine(checkUserExistence, userNotFound),
+    user: userSchema,
 });
 export type Constraints = z.infer<typeof constraintsSchema>;
 

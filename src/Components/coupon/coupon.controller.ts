@@ -10,7 +10,7 @@ import type ICoupon from "./schema/coupon.d.js";
 export const getAllCouponsHandler: RequestHandler<
     null,
     string | ICoupon[]
-> = async (req, res) => {
+> = async (_, res) => {
     const { status, data, error } = await couponStore.getAllCoupons();
     return res.status(status).send(data || error);
 };

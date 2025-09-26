@@ -6,7 +6,7 @@ import {
     postCategorySchema,
     type PostCategorySchema,
 } from "./productCategory.validate.js";
-import type IProductCategory from "./schema/productCategory.js";
+import type IProductCategory from "./schema/productCategory.d.js";
 
 // post category
 const postCategoryCTRL: RequestHandler<
