@@ -1,4 +1,4 @@
-export default {
+const collections = {
     comment: "Comment",
     coupon: "Coupon",
     order: "Order",
@@ -10,3 +10,7 @@ export default {
     shipment: "Shipment",
     user: "User",
 } as const;
+type Collections = typeof collections;
+export type CollectionsKey = keyof Collections;
+export type CollectionsValue = Collections[CollectionsKey];
+export default collections;

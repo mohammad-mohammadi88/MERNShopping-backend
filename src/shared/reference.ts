@@ -1,9 +1,7 @@
 import { Schema } from "mongoose";
-import type collections from "./collections.js";
+import type { CollectionsValue } from "./collections.js";
 
-export type Collections = keyof typeof collections;
-
-export default (ref: Collections, required = true, options?: object) => ({
+export default (ref: CollectionsValue, required = true, options?: object) => ({
     type: Schema.Types.ObjectId,
     required,
     ref,

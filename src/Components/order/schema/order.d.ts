@@ -8,7 +8,7 @@ type IOrder = Omit<PostOrderSchema, "products"> &
     Document & {
         totalPrice: number;
         products: IOrderProduct[];
-        userId: Types.ObjectId;
+        user: Types.ObjectId;
         finalPrice: number;
         createdAt: Date;
         updatedAt: Date;

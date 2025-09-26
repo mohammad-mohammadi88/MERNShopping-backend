@@ -7,7 +7,7 @@ type IOrderProduct = Omit<
     "count" | "productSalePrice" | "productPrice"
 > &
     Document & {
-        productID: Types.ObjectId;
+        product: Types.ObjectId;
         count: number;
     };
 export default IOrderProduct;

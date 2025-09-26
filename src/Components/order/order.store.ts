@@ -19,8 +19,8 @@ class OrderStore {
         errorHandler(
             () =>
                 OrderModel.find(status ? { status } : {}).populate([
-                    "userId",
-                    "products.productID",
+                    "user",
+                    "products.product",
                 ]),
             "getting all orders"
         );

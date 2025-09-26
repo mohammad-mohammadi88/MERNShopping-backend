@@ -2,7 +2,9 @@ import type { RequestHandler } from "express";
 
 import couponStore from "@/Components/coupon/coupon.store.js";
 import validate from "@/middlewares/validate.js";
+import validateAsync from "@/middlewares/validateAsync.js";
 import productStore from "@Product/product.store.js";
+import userStore from "../user/user.store.js";
 import ordersStatus from "./order.status.js";
 import ordersStore from "./order.store.js";
 import {
@@ -57,22 +59,27 @@ const postNewOrderCTRL: RequestHandler<
     };
 
     // decrease ordered products count
-    const productsPromise = products.map(async ({ productID, count }) => {
+    const productsPromise = products.map(async ({ product, count }) => {
         const { status: productStatus, error: productError } =
             await productStore.changeProductQuantity(
-                productID,
+                product,
                 (count || 1) * -1
             );
         if (productError) throw res.status(productStatus).send(productError);
     });
     await Promise.all(productsPromise);
 
+    // increase user totalOrders
+    const { status: userStatus, error: userError } =
+        await userStore.changeTotalOrdersCount(req.body.user);
+    if (userError) return res.status(userStatus).send(userError);
+
     const { status, data, error } = await ordersStore.postOrder(newOrder);
 
     return res.status(status).send(data || error);
 };
 export const postNewOrderHandler: any[] = [
-    validate(postOrderSchema),
+    validateAsync(postOrderSchema),
     postNewOrderCTRL,
 ];
 
@@ -139,15 +146,14 @@ const editOrderStatusCTRL: RequestHandler<
 
     // increase product quantity if order canceled
     if (status === ordersStatus.CANCELED) {
-        const productsPromise = prevOrder.products.map(async (product) => {
-            const { status: productStatus, error: productError } =
-                await productStore.changeProductQuantity(
-                    product.productID,
-                    product.count
-                );
-            if (productError)
-                throw res.status(productStatus).send(productError);
-        });
+        const productsPromise = prevOrder.products.map(
+            async ({ product, count }) => {
+                const { status: productStatus, error: productError } =
+                    await productStore.changeProductQuantity(product, count);
+                if (productError)
+                    throw res.status(productStatus).send(productError);
+            }
+        );
         await Promise.all(productsPromise);
     }
 

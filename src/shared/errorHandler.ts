@@ -25,8 +25,14 @@ export default async <T>(
         }
         return { data: result, status: successStatus };
     } catch (e: any) {
+        const error =
+            typeof e === "string"
+                ? e
+                : e instanceof Error
+                ? e?.message
+                : `Unexpected error happened while ${action}`;
         return {
-            error: e?.message ?? `Unexpected error happened while ${action}`,
+            error,
             status: 500,
         };
     }
