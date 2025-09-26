@@ -78,11 +78,57 @@ export const getProductByIdHandler: RequestHandler<
 };
 
 // edit Product By Id
+type ChangeCountResponse =
+    | undefined
+    | {
+          status: number;
+          error: string;
+      };
+type ChangeCountFn = (
+    prevCategoryId: string,
+    nextCategoryId: string
+) => Promise<ChangeCountResponse>;
+const changeProductCounts: ChangeCountFn = async (
+    prevCategoryId,
+    nextCategoryId
+) => {
+    const errorCreator = (
+        status: number,
+        error: string
+    ): ChangeCountResponse => ({ status, error });
+
+    // decrease prev productCategory.productCount
+    const { status: decreaseStatus, error: decreaseError } =
+        await productCategoryStore.changeProductCount(
+            prevCategoryId,
+            "decrease"
+        );
+    if (decreaseError) return errorCreator(decreaseStatus, decreaseError);
+
+    // increase prev productCategory.productCount
+    const { status: increaseStatus, error: increaseError } =
+        await productCategoryStore.changeProductCount(nextCategoryId);
+    if (increaseError) return errorCreator(increaseStatus, increaseError);
+};
+
 const editProductByIdCTRL: RequestHandler<
     ParamID,
     string | IProduct,
     EditProductSchema
 > = async (req, res) => {
+    const prevProduct = req.prevProduct!;
+    const prevCategoryId = prevProduct.productCategory as unknown as string;
+    const nextCategoryId = req.body.productCategory;
+
+    // handle productCategory.productCount
+    if (prevCategoryId !== nextCategoryId) {
+        const result = await changeProductCounts(
+            prevCategoryId,
+            nextCategoryId
+        );
+        // error handling
+        if (result) return res.status(result.status).send(result.error);
+    }
     const { status, data, error } = await productStore.editProduct(
         req.params.id,
         {

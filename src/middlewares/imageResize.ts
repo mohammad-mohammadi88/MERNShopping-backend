@@ -6,13 +6,12 @@ import { Worker } from "node:worker_threads";
 
 import type { DestroyedImages, Images } from "@/services/cloudinary/request.js";
 import { defaults } from "@/shared/index.js";
-import type IProduct from "@Products/schema/products.d.js";
 
 export interface WorkerValues {
     destroyedImages: DestroyedImages | undefined;
     action: Action;
     thumbnail: { name: string; data: Buffer };
-    prevProduct: IProduct | undefined;
+    prevThumbnail: string | undefined;
     gallery: { name: string; data: Buffer }[];
 }
 
@@ -47,15 +46,12 @@ const imageResize: (action: Action) => RequestHandler =
         const workerValues: WorkerValues = {
             action,
             destroyedImages,
-            prevProduct,
+            prevThumbnail: prevProduct?.thumbnail,
             thumbnail: { name: thumbnail.name, data: thumbnail.data },
             gallery: gallery.map((f) => ({ name: f.name, data: f.data })),
         };
 
-        worker.postMessage(workerValues, [
-            thumbnail.data.buffer as unknown as ArrayBuffer,
-            ...gallery.map((f) => f.data.buffer as unknown as ArrayBuffer),
-        ]);
+        worker.postMessage(workerValues);
         const handleError = ({ message }: Error) => {
             worker.terminate();
             return res.status(500).send(message);

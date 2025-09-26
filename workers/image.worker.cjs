@@ -18,8 +18,8 @@ cloudinary.config(defaults.cloudinary);
 
 // // Resize the image to max width of 2000px, compress to 50% quality JPEG,
 // upload to Cloudinary and return the secure_url.
-const resize = async (file) => {
-    const processedImage = await sharp(file.data)
+const resize = async (data) => {
+    const processedImage = await sharp(data)
         .resize(2000)
         .jpeg({ quality: 50 })
         .toBuffer();
@@ -33,13 +33,13 @@ const resize = async (file) => {
  */
 const handleThumbnail = async (
     destroyedImages,
-    prevProduct,
+    prevThumbnail,
     action,
     thumbnail
 ) =>
     action === "add" || (action === "edit" && destroyedImages?.thumbnail)
         ? await resize(thumbnail)
-        : prevProduct?.thumbnail;
+        : prevThumbnail;
 
 /**
  * To handle the gallery images that will be uploaded
@@ -60,12 +60,12 @@ const handleGallery = async (destroyedImages, action, gallery) =>
 
 parentPort?.on(
     "message",
-    async ({ action, destroyedImages, gallery, prevProduct, thumbnail }) => {
+    async ({ action, destroyedImages, gallery, prevThumbnail, thumbnail }) => {
         try {
             const newImage = {
                 thumbnail: await handleThumbnail(
                     destroyedImages,
-                    prevProduct,
+                    prevThumbnail,
                     action,
                     thumbnail
                 ),

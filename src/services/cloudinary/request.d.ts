@@ -1,4 +1,4 @@
-import type IProduct from "@Products/schema/products.d.js";
+import type IProduct from "@Product/schema/product.d.js";
 import "express";
 
 export interface Images {
@@ -15,7 +15,5 @@ declare module "express-serve-static-core" {
         images: Images;
         prevProduct?: IProduct;
         destroyedImages?: DestroyedImages;
-        // listing?: Listings;
-        // message?: Omit<Message, "id" | "createdAt">;
     }
 }
