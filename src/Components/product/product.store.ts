@@ -1,5 +1,9 @@
 import type { Images } from "@/services/cloudinary/request.js";
-import errorHandler from "@/shared/errorHandler.js";
+import {
+    type GetDataWithPagination,
+    type Pagination,
+    errorHandler,
+} from "@/shared/index.js";
 import ProductModel from "./product.model.js";
 import type {
     EditProductSchema,
@@ -7,16 +11,6 @@ import type {
 } from "./product.validate.js";
 import type IProduct from "./schema/product.d.js";
 
-export interface GetProducts {
-    pages: number;
-    products: IProduct[];
-    perPage: number;
-    currentPage: number;
-}
-export interface Pagination {
-    perPage?: number;
-    page?: number;
-}
 class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => ProductModel.create(data), "creating new product", {
@@ -52,7 +46,7 @@ class ProductStore {
     };
 
     getProducts = (pagination?: Required<Pagination>) =>
-        errorHandler(async (): Promise<GetProducts> => {
+        errorHandler(async (): Promise<GetDataWithPagination<IProduct>> => {
             const result = ProductModel.find();
             const totalDocs = await ProductModel.countDocuments();
             if (!pagination)
@@ -60,18 +54,18 @@ class ProductStore {
                     currentPage: 1,
                     perPage: totalDocs,
                     pages: 1,
-                    products: (await result) as unknown as IProduct[],
+                    data: (await result) as unknown as IProduct[],
                 };
 
             const { page, perPage } = pagination;
             const pages = Math.ceil(totalDocs / perPage);
             const currentPage = pages === 0 ? 1 : Math.min(page, pages);
             const skip = (currentPage - 1) * perPage;
-            const products = (await result
+            const data = (await result
                 .skip(skip)
                 .limit(perPage)) as unknown as IProduct[];
 
-            return { pages, perPage, currentPage, products };
+            return { pages, perPage, currentPage, data };
         }, "getting products");
 
     editProduct = (id: string, data: EditProductSchema & Images) =>

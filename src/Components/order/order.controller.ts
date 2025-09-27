@@ -2,6 +2,7 @@ import type { RequestHandler } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
 import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.js";
+import type { GetDataWithPagination, Pagination } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
 import productStore from "@Product/product.store.js";
 import userStore from "@User/user.store.js";
@@ -97,15 +98,24 @@ export const postNewOrderHandler: any[] = [
 ];
 
 // get all orders
+const check = (i: number): boolean => i < 1 || !Number.isInteger(i);
 export const getAllOrdersHandler: RequestHandler<
     null,
-    string | IOrder[],
+    string | GetDataWithPagination<IOrder>,
     null,
-    { status: string }
+    { status: string } & Pagination
 > = async (req, res) => {
-    const { status, data, error } = await ordersStore.getAllOrders(
-        Number(req.query.status)
-    );
+    let pagination: Required<Pagination> | undefined = {
+        page: Number(req.query.page) ?? -1,
+        perPage: Number(req.query.perPage) ?? -1,
+    };
+    if (check(pagination.page) || check(pagination.perPage))
+        pagination = undefined;
+
+    const { status, data, error } = await ordersStore.getAllOrders({
+        status: Number(req.query.status),
+        pagination,
+    });
     return res.status(status).send(data || error);
 };
 

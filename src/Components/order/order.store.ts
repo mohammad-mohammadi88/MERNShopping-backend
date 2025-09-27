@@ -1,6 +1,11 @@
-import errorHandler from "@/shared/errorHandler.js";
-import OrderModel from "./order.model.js";
+import {
+    type GetDataWithPagination,
+    type Pagination,
+    errorHandler,
+} from "@/shared/index.js";
+import { default as OrderModel, default as orderModel } from "./order.model.js";
 import type { PostOrderSchema } from "./order.validate.js";
+import type IOrder from "./schema/order.d.js";
 
 type PostOrderData = PostOrderSchema & {
     totalPrice: number;
@@ -15,15 +20,34 @@ class OrderStore {
     getOrdersCount = () =>
         errorHandler(() => OrderModel.countDocuments(), "getting orders count");
 
-    getAllOrders = (status?: number) =>
-        errorHandler(
-            () =>
-                OrderModel.find(status ? { status } : {}).populate([
-                    "user",
-                    "products.product",
-                ]),
-            "getting all orders"
-        );
+    getAllOrders = ({
+        status,
+        pagination,
+    }: {
+        status?: number;
+        pagination?: Required<Pagination>;
+    }) =>
+        errorHandler(async (): Promise<GetDataWithPagination<IOrder>> => {
+            const result = orderModel
+                .find(status ? { status } : {})
+                .populate(["user", "products.product"]);
+            const totalDocs = await orderModel.countDocuments();
+            if (!pagination)
+                return {
+                    currentPage: 1,
+                    perPage: totalDocs,
+                    pages: 1,
+                    data: await result,
+                };
+
+            const { page, perPage } = pagination;
+            const pages = Math.ceil(totalDocs / perPage);
+            const currentPage = pages === 0 ? 1 : Math.min(page, pages);
+            const skip = (currentPage - 1) * perPage;
+            const data = await result.skip(skip).limit(perPage);
+
+            return { pages, perPage, currentPage, data };
+        }, "getting orders");
 
     getOrder = (id: string) =>
         errorHandler(() => OrderModel.findById(id), "getting one order", {

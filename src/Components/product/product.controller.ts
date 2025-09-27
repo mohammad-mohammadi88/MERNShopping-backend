@@ -6,11 +6,9 @@ import {
     imageResize,
     validateAsync,
 } from "@/middlewares/index.js";
+import { type GetDataWithPagination, type Pagination } from "@/shared/index.js";
 import productCategoryStore from "@P_Category/productCategory.store.js";
-import productStore, {
-    type GetProducts,
-    type Pagination,
-} from "./product.store.js";
+import productStore from "./product.store.js";
 import {
     editProductSchema,
     postProductSchema,
@@ -52,7 +50,7 @@ export const postProductHandler: any[] = [
 const check = (i: number): boolean => i < 1 || !Number.isInteger(i);
 export const getAllProductsHandler: RequestHandler<
     null,
-    string | GetProducts,
+    string | GetDataWithPagination<IProduct>,
     null,
     Pagination
 > = async (req, res) => {

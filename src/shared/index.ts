@@ -11,3 +11,14 @@ export { default as urlToPublicId } from "./urlToPublicId.js";
 
 // I will use it as `${action}ing`
 export type Action = "increas" | "decreas";
+
+export interface GetDataWithPagination<T> {
+    pages: number;
+    data: T[];
+    perPage: number;
+    currentPage: number;
+}
+export interface Pagination {
+    perPage?: number;
+    page?: number;
+}
