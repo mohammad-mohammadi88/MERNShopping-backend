@@ -25,12 +25,12 @@ const orderSchema: Schema<IOrder> = new Schema(
         deliveryAddress: { type: userAddressSchema },
     },
     { timestamps: true }
-);
-orderSchema.pre("validate", async function () {
+).pre("validate", async function () {
     if (!this.deliveryAddress) {
         const user = await userModel.findById(this.user);
         this.deliveryAddress =
             user && user.addresses.length > 0 ? user.addresses[0] : null;
     }
 });
+
 export default orderSchema;

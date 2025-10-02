@@ -1,8 +1,14 @@
-type Result<T> = {
-    status: number;
-    error?: string;
-    data?: NonNullable<T>;
-};
+type Result<T> =
+    | {
+          data: NonNullable<T>;
+          status: number;
+          error?: undefined;
+      }
+    | {
+          status: number;
+          data?: undefined;
+          error: string;
+      };
 interface Options {
     notFoundError?: string;
     successStatus?: number;

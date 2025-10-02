@@ -1,5 +1,5 @@
 import type ICoupon from "@Coupon/schema/coupon.d.js";
-import type CouponHandler from "./CouponHandler.d.js";
+import type CouponHandler from "./CouponHandler.js";
 
 export default class AbstractCouponHandler implements CouponHandler {
     private nextHandler: CouponHandler | undefined;

@@ -24,18 +24,11 @@ class ProductStore {
 
     changeProductQuantity = (_id: string, quantityEffect: number) => {
         const action = quantityEffect > 0 ? "increas" : "decreas";
+        const $gt = (quantityEffect > 0 ? -1 : Math.abs(quantityEffect)) - 1;
         return errorHandler(
             async () =>
                 await ProductModel.findOneAndUpdate(
-                    {
-                        _id,
-                        quantity: {
-                            $gte:
-                                quantityEffect > 0
-                                    ? -1
-                                    : Math.abs(quantityEffect),
-                        },
-                    },
+                    { _id },
                     { $inc: { quantity: quantityEffect } }
                 ),
             `${action}ing product quantity with id #${_id}`,

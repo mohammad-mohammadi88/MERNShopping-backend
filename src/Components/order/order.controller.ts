@@ -1,9 +1,9 @@
 import type { RequestHandler } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
+import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.js";
 import type { GetDataWithPagination, Pagination } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
-import CouponValidator from "@Coupon/CouponValidator/CouponValidator.js";
 import productStore from "@Product/product.store.js";
 import userStore from "@User/user.store.js";
 import ordersStatus from "./order.status.js";
@@ -26,6 +26,23 @@ const postNewOrderCTRL: RequestHandler<
     PostOrderSchema
 > = async (req, res) => {
     const { products, couponCode } = req.body;
+
+    // decrease product quantity count
+    const productsPromise = products.map(async ({ product, count }) => {
+        const { status: productStatus, error: productError } =
+            await productStore.changeProductQuantity(
+                product,
+                (count || 1) * -1
+            );
+        if (productError) throw res.status(productStatus).send(productError);
+    });
+    await Promise.all(productsPromise);
+
+    // increase user totalOrders
+    const { status: userStatus, error: userError } =
+        await userStore.changeTotalOrdersCount(req.body.user);
+    if (userError) return res.status(userStatus).send(userError);
+
     const calcPrice = (
         param: "productPrice" | "productSalePrice" = "productPrice"
     ) =>
@@ -56,6 +73,7 @@ const postNewOrderCTRL: RequestHandler<
             return res.status(400).send(error);
         }
 
+        // change coupon used times
         const { status: cStatus, error: cError } =
             await couponStore.changeCouponUsedTimes(couponCode);
         if (cError) return res.status(cStatus).send(cError);
@@ -64,29 +82,14 @@ const postNewOrderCTRL: RequestHandler<
         const discountPrice =
             role === "number" ? amount : calcPercent(finalPrice, amount);
 
-        finalPrice = Math.max(finalPrice - discountPrice, 0);
+        finalPrice =
+            Math.round(Math.max(finalPrice - discountPrice, 0) * 100) / 100;
     }
     const newOrder = {
         ...req.body,
         totalPrice,
         finalPrice,
     };
-
-    // decrease ordered products count
-    const productsPromise = products.map(async ({ product, count }) => {
-        const { status: productStatus, error: productError } =
-            await productStore.changeProductQuantity(
-                product,
-                (count || 1) * -1
-            );
-        if (productError) throw res.status(productStatus).send(productError);
-    });
-    await Promise.all(productsPromise);
-
-    // increase user totalOrders
-    const { status: userStatus, error: userError } =
-        await userStore.changeTotalOrdersCount(req.body.user);
-    if (userError) return res.status(userStatus).send(userError);
 
     const { status, data, error } = await ordersStore.postOrder(newOrder);
 
