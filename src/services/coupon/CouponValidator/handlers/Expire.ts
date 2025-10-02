@@ -1,10 +1,13 @@
 import type ICoupon from "@Coupon/schema/coupon.d.js";
 import AbstractCouponHandler from "../AbstractCouponHandler.js";
+import couponInactivator from "../couponInactivator.js";
 
 export default class ExpireHandler extends AbstractCouponHandler {
-    public process(user: string, coupon: ICoupon): ICoupon {
-        if (coupon.expiresAt.getTime() < Date.now())
-            throw new Error("This coupon is expired");
-        return super.process(user, coupon);
+    public async process(userId: string, coupon: ICoupon): Promise<ICoupon> {
+        if (coupon.expiresAt.getTime() >= Date.now())
+            return await super.process(userId, coupon);
+
+        await couponInactivator(coupon.code);
+        throw new Error("This coupon is expired");
     }
 }

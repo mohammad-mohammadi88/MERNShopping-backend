@@ -1,9 +1,9 @@
 import type { RequestHandler } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
-import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.js";
 import type { GetDataWithPagination, Pagination } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
+import CouponValidator from "@Coupon/CouponValidator/CouponValidator.js";
 import productStore from "@Product/product.store.js";
 import userStore from "@User/user.store.js";
 import ordersStatus from "./order.status.js";
@@ -50,7 +50,7 @@ const postNewOrderCTRL: RequestHandler<
 
         try {
             const validator = new CouponValidator();
-            validator.handler(req.body.user, coupon);
+            await validator.handler(req.body.user, coupon);
         } catch (e: unknown) {
             const error = (e as Error).message;
             return res.status(400).send(error);
@@ -105,6 +105,7 @@ export const getAllOrdersHandler: RequestHandler<
     null,
     { status: string } & Pagination
 > = async (req, res) => {
+    const reqStatus = req.query.status;
     let pagination: Required<Pagination> | undefined = {
         page: Number(req.query.page) ?? -1,
         perPage: Number(req.query.perPage) ?? -1,
@@ -113,7 +114,7 @@ export const getAllOrdersHandler: RequestHandler<
         pagination = undefined;
 
     const { status, data, error } = await ordersStore.getAllOrders({
-        status: Number(req.query.status),
+        status: reqStatus ? Number(reqStatus) : undefined,
         pagination,
     });
     return res.status(status).send(data || error);
@@ -175,7 +176,7 @@ const editOrderStatusCTRL: RequestHandler<
                     prevOrder.couponCode,
                     "decreas"
                 );
-            return res.status(couponStatus).send(couponError);
+            if (couponError) return res.status(couponStatus).send(couponError);
         }
         // increase product quantity if order canceled
         const productsPromise = prevOrder.products.map(

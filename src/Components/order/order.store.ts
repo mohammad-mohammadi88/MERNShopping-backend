@@ -29,7 +29,7 @@ class OrderStore {
     }) =>
         errorHandler(async (): Promise<GetDataWithPagination<IOrder>> => {
             const result = orderModel
-                .find(status ? { status } : {})
+                .find(typeof status === "number" ? { status } : {})
                 .populate(["user", "products.product"]);
             const totalDocs = await orderModel.countDocuments();
             if (!pagination)

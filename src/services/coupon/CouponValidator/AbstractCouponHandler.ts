@@ -7,9 +7,9 @@ export default class AbstractCouponHandler implements CouponHandler {
     public setNext = (handler: CouponHandler): CouponHandler =>
         (this.nextHandler = handler);
 
-    public process(userId: string, request: ICoupon): ICoupon {
+    public async process(userId: string, request: ICoupon): Promise<ICoupon> {
         return this.nextHandler
-            ? this.nextHandler.process(userId, request)
+            ? await this.nextHandler.process(userId, request)
             : request;
     }
 }

@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-import { reference, statusSchema } from "@/shared/index.js";
+import { errorHandler, reference, statusSchema } from "@/shared/index.js";
 import couponStatus from "../coupon.status.js";
 import type ICoupon from "./coupon.d.js";
 
@@ -60,5 +60,32 @@ const CouponSchema = new Schema<ICoupon>(
     },
     { timestamps: true }
 );
+CouponSchema.pre("findOneAndUpdate", async function (next) {
+    const coupon: ICoupon | null = await this.model.findOne(this.getQuery());
+
+    if (!coupon) return next(new Error("Coupon with this code not found"));
+
+    const updateParams: any = this.getUpdate();
+    const changeValue = updateParams?.$inc?.used;
+
+    if (!updateParams.$inc || typeof changeValue !== "number") return next();
+
+    const { used, limit, status, _id } = coupon;
+
+    if (used + changeValue !== limit && status !== couponStatus.INACTIVE)
+        return next();
+
+    const newStatus =
+        status === couponStatus.ACTIVE
+            ? couponStatus.INACTIVE
+            : couponStatus.ACTIVE;
+
+    const { error } = await errorHandler(
+        () => this.model.findByIdAndUpdate(_id, { status: newStatus }),
+        "updating coupon status",
+        { notFoundError: `Coupon with id #${_id}` }
+    );
+    return next(error ? new Error(error) : undefined);
+});
 
 export default CouponSchema;

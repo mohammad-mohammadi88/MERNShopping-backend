@@ -1,15 +1,23 @@
 import type ICoupon from "@Coupon/schema/coupon.d.js";
-import { ExpireHandler, LimitHandler, UserHandler } from "./handlers/index.js";
+import {
+    ExpireHandler,
+    LimitHandler,
+    StatusHandler,
+    UserHandler,
+} from "./handlers/index.js";
 
 export default class CouponValidator {
-    handler = (userId: string, coupon: ICoupon) => {
+    handler = (userId: string, coupon: ICoupon): Promise<ICoupon> => {
+        const statusHandler = new StatusHandler();
         const userHandler = new UserHandler();
         const limitHandler = new LimitHandler();
         const expireHandler = new ExpireHandler();
 
-        userHandler.setNext(limitHandler).setNext(expireHandler);
-        console.log("🚀 ~ CouponValidator ~ userHandler:", userHandler);
+        statusHandler
+            .setNext(userHandler)
+            .setNext(limitHandler)
+            .setNext(expireHandler);
 
-        return userHandler.process(userId, coupon);
+        return statusHandler.process(userId, coupon);
     };
 }

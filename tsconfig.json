@@ -26,7 +26,7 @@
             "@P_Offer/*": [ "Components/productOffer/*" ],
             "@Product/*": [ "Components/product/*" ],
             "@Payment/*": [ "Components/payment/*" ],
-            "@Coupon/*": [ "Components/coupon/*" ],
+            "@Coupon/*": [ "Components/coupon/*","services/coupon/*" ],
             "@Order/*": [ "Components/order/*" ],
             "@User/*": [ "Components/user/*" ]
         }

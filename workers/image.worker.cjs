@@ -20,7 +20,7 @@ cloudinary.config(defaults.cloudinary);
 // upload to Cloudinary and return the secure_url.
 const resize = async (data) => {
     const processedImage = await sharp(data)
-        .resize(2000)
+        .resize(1000)
         .jpeg({ quality: 50 })
         .toBuffer();
     return (await uploadToCloudinary(processedImage)).secure_url;
