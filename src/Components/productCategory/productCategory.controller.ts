@@ -1,6 +1,11 @@
 import type { RequestHandler } from "express";
 
 import validate from "@/middlewares/validate.js";
+import {
+    paginationHandler,
+    type GetDataWithPagination,
+    type Pagination,
+} from "@/shared/index.js";
 import productCategoryStore from "./productCategory.store.js";
 import {
     postCategorySchema,
@@ -28,9 +33,13 @@ export const postCategoryHandler: any[] = [
 // get categories
 export const getCategoriesHandler: RequestHandler<
     null,
-    string | IProductCategory[]
-> = async (_, res) => {
-    const { status, data, error } = await productCategoryStore.getCategories();
+    string | GetDataWithPagination<IProductCategory>,
+    null,
+    Pagination
+> = async (req, res) => {
+    const { status, data, error } = await productCategoryStore.getCategories(
+        paginationHandler(req)
+    );
     return res.status(status).send(error || data);
 };
 
