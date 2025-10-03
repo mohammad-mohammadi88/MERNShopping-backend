@@ -63,7 +63,7 @@ const productSchemaBase = {
     title: z.string(),
     price: number(),
     quantity: number(
-        z.number().nonnegative().int("quantity cannot be flout").optional()
+        z.number().nonnegative().int("quantity cannot be floot").optional()
     ),
     productCategory,
     attrs: array(z.array(attrSchema).optional()),

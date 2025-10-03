@@ -2,33 +2,9 @@ import type { Request, RequestHandler } from "express";
 import type { UploadedFile } from "express-fileupload";
 
 import { deleteImage } from "@/services/cloudinary/index.js";
-import type { DestroyedImages } from "@/services/cloudinary/request.js";
 import { getDecodedName, urlToPublicId } from "@/shared/index.js";
 import productStore from "@Product/product.store.js";
 import type { EditProductSchema } from "@Product/product.validate.js";
-
-/**
- * Add to destroyedImages list in request
- * - if the value is boolean we asign thumbnail is to thumbnail, which shows if the thumbnail is destroyed or not
- * - if it is an array of string we asign it to gallery param.
- * - if it is a string we push it to gallery param.
- * This function can be used to add both thumbnail and gallery
- */
-const markDestroyedImages = (
-    req: Request,
-    value: boolean | string[] | string
-): void => {
-    const destroyedImages =
-        req?.destroyedImages ??
-        ({
-            thumbnail: undefined,
-            gallery: [],
-        } as DestroyedImages);
-    if (typeof value === "boolean") destroyedImages.thumbnail = value;
-    else if (typeof value === "string") destroyedImages?.gallery.push(value);
-    else destroyedImages.gallery = value;
-    req.destroyedImages = destroyedImages;
-};
 
 /**
  * Normalize gallery input.
@@ -37,8 +13,8 @@ const markDestroyedImages = (
  */
 const normalizeGalleryInput = (
     gallery: UploadedFile[] | UploadedFile | undefined
-): UploadedFile[] | undefined => {
-    if (!gallery) return undefined;
+): UploadedFile[] => {
+    if (!gallery) return [];
     return Array.isArray(gallery) ? gallery : [gallery];
 };
 
@@ -51,33 +27,35 @@ const normalizeGalleryInput = (
 const getImagesToDestroyOnEdit = (
     prevProduct: { thumbnail: string; gallery?: string[] },
     thumbnail: UploadedFile | undefined,
-    gallery: UploadedFile[] | undefined,
+    gallery: UploadedFile[],
     req: Request
 ): string[] => {
+    req.newGalleryImages = [];
     const images: string[] = [];
 
     // Check thumbnail
     // mark thumbnail as distroyed image
     if (thumbnail && getDecodedName(thumbnail) !== prevProduct.thumbnail) {
+        console.log("fffff", getDecodedName(thumbnail), prevProduct.thumbnail);
         images.push(prevProduct.thumbnail);
-        markDestroyedImages(req, true);
+        req.isThumbnailDestroyed = true;
     }
 
-    // Check gallery
-    if (gallery)
-        prevProduct.gallery?.forEach((image) => {
-            const exists = gallery.some(
-                (file) => getDecodedName(file) === image
-            );
-            if (exists) return;
+    // add new gallery images to req.newGalleryImages
+    gallery?.forEach((image) => {
+        const name = getDecodedName(image);
+        const isNewImage = !prevProduct.gallery?.includes(name);
+        if (isNewImage) req.newGalleryImages.push(name);
+    });
+
+    // add images to destroy list
+    prevProduct.gallery?.forEach((image) => {
+        // If no new gallery is provided, destroy all previous gallery images
+        if (!gallery) return images.push(image);
+
+        if (!gallery.some((file) => getDecodedName(file) === image))
             images.push(image);
-            markDestroyedImages(req, image);
-        });
-    // If no new gallery is provided, destroy all previous gallery images and add them to destroyedImages list
-    else {
-        prevProduct.gallery?.forEach((image) => images.push(image));
-        markDestroyedImages(req, prevProduct.gallery as string[]);
-    }
+    });
 
     return images;
 };
@@ -87,15 +65,13 @@ const getImagesToDestroyOnEdit = (
  * - Always destroy the thumbnail
  * - Always destroy all gallery images
  */
-const getImagesToDestroyOnDelete = (prevProduct: {
+const getImagesToDestroyOnDelete = ({
+    thumbnail,
+    gallery,
+}: {
     thumbnail: string;
     gallery?: string[];
-}): string[] => {
-    const images: string[] = [];
-    images.push(prevProduct.thumbnail);
-    prevProduct.gallery?.forEach((image) => images.push(image));
-    return images;
-};
+}): string[] => [thumbnail, ...(gallery || [])];
 
 const imageDestroyer: (
     action: "edit" | "delete"
@@ -116,16 +92,10 @@ const imageDestroyer: (
         if (!prevProduct) return;
 
         const thumbnail = req.files?.thumbnail as UploadedFile | undefined;
-        let gallery = req.files?.gallery as
-            | UploadedFile[]
-            | UploadedFile
-            | undefined;
-
         if (!thumbnail && action === "edit")
             return res.status(400).send("Thumbnail is required");
 
-        // Normalize gallery input
-        gallery = normalizeGalleryInput(gallery);
+        const gallery = normalizeGalleryInput(req.files?.gallery);
 
         // Get list of images to destroy
         const images =

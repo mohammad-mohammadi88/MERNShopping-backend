@@ -1,4 +1,4 @@
-type Result<T> =
+export type Result<T> =
     | {
           data: NonNullable<T>;
           status: number;

@@ -6,7 +6,11 @@ import {
     imageResize,
     validateAsync,
 } from "@/middlewares/index.js";
-import { type GetDataWithPagination, type Pagination } from "@/shared/index.js";
+import {
+    paginationHandler,
+    type GetDataWithPagination,
+    type Pagination,
+} from "@/shared/index.js";
 import productCategoryStore from "@P_Category/productCategory.store.js";
 import productStore from "./product.store.js";
 import {
@@ -24,6 +28,7 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
+    console.log("body", req.body);
     const { status: categoryStatus, error: categoryError } =
         // default action is increase
         await productCategoryStore.changeProductCount(
@@ -47,21 +52,15 @@ export const postProductHandler: any[] = [
 ];
 
 // Get All Products
-const check = (i: number): boolean => i < 1 || !Number.isInteger(i);
 export const getAllProductsHandler: RequestHandler<
     null,
     string | GetDataWithPagination<IProduct>,
     null,
     Pagination
 > = async (req, res) => {
-    let pagination: Required<Pagination> | undefined = {
-        page: Number(req.query.page) ?? -1,
-        perPage: Number(req.query.perPage) ?? -1,
-    };
-    if (check(pagination.page) || check(pagination.perPage))
-        pagination = undefined;
-
-    const { status, data, error } = await productStore.getProducts(pagination);
+    const { status, data, error } = await productStore.getProducts(
+        paginationHandler(req)
+    );
     return res.status(status).send(error || data);
 };
 

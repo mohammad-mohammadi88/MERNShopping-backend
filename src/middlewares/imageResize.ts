@@ -4,15 +4,19 @@ import { resolve } from "node:path";
 import { cwd } from "node:process";
 import { Worker } from "node:worker_threads";
 
-import type { DestroyedImages, Images } from "@/services/cloudinary/request.js";
+import type { Images } from "@/services/cloudinary/request.js";
 import { defaults } from "@/shared/index.js";
 
 export interface WorkerValues {
-    destroyedImages: DestroyedImages | undefined;
+    newGalleryImages: string[];
     action: Action;
-    thumbnail: { name: string; data: Buffer };
-    prevThumbnail: string | undefined;
-    gallery: { name: string; data: Buffer }[];
+    thumbnail: {
+        name: string;
+        data: Buffer;
+        prevThumbnail: string | undefined;
+    };
+    isThumbnailDestroyed: boolean;
+    gallery: { name: string; data: Buffer }[] | undefined;
 }
 
 type Action = "add" | "edit";
@@ -42,13 +46,22 @@ const imageResize: (action: Action) => RequestHandler =
 
         const worker = new Worker(resolve(cwd(), "./workers/image.worker.cjs"));
 
-        const { destroyedImages, prevProduct } = req;
+        const { isThumbnailDestroyed, newGalleryImages, prevProduct } = req;
         const workerValues: WorkerValues = {
             action,
-            destroyedImages,
-            prevThumbnail: prevProduct?.thumbnail,
-            thumbnail: { name: thumbnail.name, data: thumbnail.data },
-            gallery: gallery.map((f) => ({ name: f.name, data: f.data })),
+            newGalleryImages,
+            thumbnail: {
+                name: thumbnail.name,
+                data: Buffer.from(thumbnail.data),
+                prevThumbnail: prevProduct?.thumbnail,
+            },
+            isThumbnailDestroyed: !!isThumbnailDestroyed,
+            gallery: gallery
+                ? gallery.map((f) => ({
+                      name: f.name,
+                      data: Buffer.from(f.data),
+                  }))
+                : undefined,
         };
 
         worker.postMessage(workerValues);
@@ -56,6 +69,7 @@ const imageResize: (action: Action) => RequestHandler =
             worker.terminate();
             return res.status(500).send(message);
         };
+
         worker.on("message", (value: string | Images) => {
             // error check
             if (typeof value === "string")

@@ -1,15 +1,28 @@
-import { type Action, errorHandler } from "@/shared/index.js";
+import type {
+    Action,
+    GetDataFns,
+    PaginationWithStatus,
+} from "@/shared/index.js";
+import { errorHandler, paginateData } from "@/shared/index.js";
 import couponModel from "./coupon.model.js";
 import couponStatus from "./coupon.status.js";
 import type { PostCouponSchema } from "./coupon.validate.js";
+import type ICoupon from "./schema/coupon.d.js";
 
 export type Code = { code: string };
 const couponNotFound = (code: string): string =>
     `Coupon with code ${code} doesn't exists`;
 
+const getterFns: (status?: number) => GetDataFns<ICoupon> = (status) => ({
+    getDataFn: () =>
+        couponModel
+            .find(typeof status === "number" ? { status } : {})
+            .populate(["constraints.user"]),
+    getCountFn: () => couponModel.countDocuments(),
+});
 class CouponStore {
-    getAllCoupons = () =>
-        errorHandler(() => couponModel.find(), "getting coupons list");
+    getAllCoupons = ({ status, pagination }: PaginationWithStatus) =>
+        paginateData<ICoupon>(getterFns(status), "coupon", pagination);
 
     addCoupon = (data: PostCouponSchema & Code) =>
         errorHandler(() => couponModel.create(data), "adding new coupon", {
