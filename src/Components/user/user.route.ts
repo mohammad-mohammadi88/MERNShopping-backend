@@ -1,12 +1,11 @@
 import express from "express";
+
+import { getUsersHandler } from "./user.controller.js";
 import userModel from "./user.model.js";
 
 const router = express.Router();
 
-router.get("/", async (req, res) => {
-    const allUsers = await userModel.find();
-    res.json(allUsers);
-});
+router.get("/", getUsersHandler);
 router.post("/", async (req, res) => {
     const mobile = "09146360528";
     const firstName = "mohammad";

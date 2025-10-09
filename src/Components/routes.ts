@@ -11,7 +11,7 @@ import express from "express";
 const appRouter = express.Router();
 
 appRouter.use("/categories", productCategoryRouter);
-appRouter.use("/coupon", couponRouter);
+appRouter.use("/coupons", couponRouter);
 appRouter.use("/offers", productOffersRouter);
 appRouter.use("/orders", orderRouter);
 appRouter.use("/products", productRouter);

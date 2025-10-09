@@ -44,5 +44,4 @@ class OrderStore {
         );
 }
 
-const orderStore = new OrderStore();
-export default orderStore;
+export default new OrderStore();

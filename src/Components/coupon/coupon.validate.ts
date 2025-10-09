@@ -24,7 +24,7 @@ export type Constraints = z.infer<typeof constraintsSchema>;
 
 export const postCouponSchema = z.object({
     discount: discountSchema,
-    limit: z.number().nonnegative().int("limit cannot be a flout"),
+    limit: z.number().nonnegative().int("limit cannot be a float"),
     expiresAt: z.preprocess((val) => {
         if (typeof val === "string" || typeof val === "number") {
             const d = new Date(val);

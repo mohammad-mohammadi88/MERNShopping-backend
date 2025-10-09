@@ -17,9 +17,9 @@ const app = express();
     cloudinary.config(defaults.cloudinary);
 
     // middleware
+    app.use(helmet());
     app.use(cors());
     app.use(compression());
-    app.use(helmet());
     app.use(express.json());
 
     // routes

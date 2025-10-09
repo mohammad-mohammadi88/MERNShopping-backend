@@ -54,7 +54,7 @@ const CouponSchema = new Schema<ICoupon>(
                 message: ({ value }) =>
                     `${new Date(
                         value
-                    ).toISOString()} is passed and cannot be used ad expiresAt`,
+                    ).toISOString()} is passed and cannot be used as expiresAt`,
             },
         },
     },

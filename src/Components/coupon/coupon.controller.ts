@@ -1,7 +1,13 @@
 import type { RequestHandler } from "express";
 
 import validateAsync from "@/middlewares/validateAsync.js";
-import couponCodeGenerator from "@/services/coupon/couponCodeGenerator.js";
+import type {
+    GetDataWithPagination,
+    Pagination,
+    Status,
+} from "@/shared/index.js";
+import paginationHandler from "@/shared/paginationHandler.js";
+import couponCodeGenerator from "@Coupon/couponCodeGenerator.js";
 import couponStore, { type Code } from "./coupon.store.js";
 import { postCouponSchema, type PostCouponSchema } from "./coupon.validate.js";
 import type ICoupon from "./schema/coupon.d.js";
@@ -9,9 +15,17 @@ import type ICoupon from "./schema/coupon.d.js";
 // get all coupons
 export const getAllCouponsHandler: RequestHandler<
     null,
-    string | ICoupon[]
-> = async (_, res) => {
-    const { status, data, error } = await couponStore.getAllCoupons();
+    string | GetDataWithPagination<ICoupon>,
+    null,
+    Status & Pagination
+> = async (req, res) => {
+    const reqStatus = req.query.status;
+
+    const pagination = paginationHandler(req);
+    const { status, data, error } = await couponStore.getAllCoupons({
+        status: reqStatus ? Number(reqStatus) : undefined,
+        pagination,
+    });
     return res.status(status).send(data || error);
 };
 

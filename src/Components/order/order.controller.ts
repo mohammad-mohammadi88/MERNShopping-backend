@@ -6,6 +6,7 @@ import {
     paginationHandler,
     type GetDataWithPagination,
     type Pagination,
+    type Status,
 } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
 import productStore from "@Product/product.store.js";
@@ -109,7 +110,7 @@ export const getAllOrdersHandler: RequestHandler<
     null,
     string | GetDataWithPagination<IOrder>,
     null,
-    { status: string } & Pagination
+    Status & Pagination
 > = async (req, res) => {
     const reqStatus = req.query.status;
 

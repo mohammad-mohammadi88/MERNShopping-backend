@@ -13,7 +13,9 @@ export type Code = { code: string };
 const couponNotFound = (code: string): string =>
     `Coupon with code ${code} doesn't exists`;
 
-const getterFns: (status?: number) => GetDataFns<ICoupon> = (status) => ({
+const getterFns: (status?: number | undefined) => GetDataFns<ICoupon> = (
+    status
+) => ({
     getDataFn: () =>
         couponModel
             .find(typeof status === "number" ? { status } : {})

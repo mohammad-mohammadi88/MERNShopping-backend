@@ -26,6 +26,9 @@ export interface Pagination {
     perPage?: number;
     page?: number;
 }
+export interface Status {
+    status: string;
+}
 export interface PaginationWithStatus {
     status?: number;
     pagination?: Required<Pagination>;
