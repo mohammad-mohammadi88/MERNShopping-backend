@@ -10,6 +10,7 @@ export { default as paginationHandler } from "./paginationHandler.js";
 export { default as redisConnection } from "./redis.js";
 export { default as reference } from "./reference.js";
 export * from "./schema.js";
+export { default as searchFields } from "./searchFields.js";
 export { default as statusSchema } from "./statusSchema.js";
 export { default as urlToPublicId } from "./urlToPublicId.js";
 
@@ -32,4 +33,7 @@ export interface Status {
 export interface PaginationWithStatus {
     status?: number;
     pagination?: Required<Pagination>;
+}
+export interface IQuery {
+    query: string;
 }

@@ -1,9 +1,12 @@
+import type { PipelineStage } from "mongoose";
+
 import type {
     Action,
     GetDataFns,
+    IQuery,
     PaginationWithStatus,
 } from "@/shared/index.js";
-import { errorHandler, paginateData } from "@/shared/index.js";
+import { errorHandler, paginateData, searchFields } from "@/shared/index.js";
 import couponModel from "./coupon.model.js";
 import couponStatus from "./coupon.status.js";
 import type { PostCouponSchema } from "./coupon.validate.js";
@@ -13,18 +16,56 @@ export type Code = { code: string };
 const couponNotFound = (code: string): string =>
     `Coupon with code ${code} doesn't exists`;
 
-const getterFns: (status?: number | undefined) => GetDataFns<ICoupon> = (
-    status
-) => ({
-    getDataFn: () =>
-        couponModel
-            .find(typeof status === "number" ? { status } : {})
-            .populate(["constraints.user"]),
-    getCountFn: () => couponModel.countDocuments(),
-});
+type GetterFnParams = { status: number | undefined } & IQuery;
 class CouponStore {
-    getAllCoupons = ({ status, pagination }: PaginationWithStatus) =>
-        paginateData<ICoupon>(getterFns(status), "coupon", pagination);
+    private getterFns = ({
+        query,
+        status,
+    }: GetterFnParams): GetDataFns<ICoupon> => ({
+        getDataFn: () =>
+            this.searchData(
+                query,
+                status ? [{ $match: { status } }] : undefined
+            ) as any,
+        getCountFn: () => couponModel.countDocuments(),
+    });
+
+    getAllCoupons = ({
+        pagination,
+        ...params
+    }: PaginationWithStatus & GetterFnParams) =>
+        paginateData<ICoupon>(this.getterFns(params), "coupon", pagination);
+
+    private searchData = (
+        query: string,
+        extraSearch?: PipelineStage[] | undefined
+    ) => {
+        const userFields = [
+            "code",
+            "user.firstName",
+            "user.lastName",
+            "user.email",
+            "user.mobile",
+        ];
+        const pipeline: PipelineStage[] = [
+            {
+                $lookup: {
+                    from: "users",
+                    localField: "user",
+                    foreignField: "_id",
+                    as: "user",
+                },
+            },
+            { $unwind: "$user" },
+        ];
+        const orConditions = searchFields(userFields, query);
+        if (orConditions.length > 0 && query.trim() !== "") {
+            pipeline.push({ $match: { $or: orConditions } });
+        }
+
+        if (extraSearch) pipeline.push(...extraSearch);
+        return couponModel.aggregate(pipeline);
+    };
 
     addCoupon = (data: PostCouponSchema & Code) =>
         errorHandler(() => couponModel.create(data), "adding new coupon", {

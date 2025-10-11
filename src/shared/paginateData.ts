@@ -28,5 +28,5 @@ export default <T>(
         const skip = (currentPage - 1) * perPage;
         const data = (await result.skip(skip).limit(perPage)) as unknown as T[];
 
-        return { pages, perPage, currentPage, data };
+        return { currentPage, perPage, pages, data };
     }, `getting ${dataName}s`);

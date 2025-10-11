@@ -3,6 +3,7 @@ import type { RequestHandler } from "express";
 import validateAsync from "@/middlewares/validateAsync.js";
 import type {
     GetDataWithPagination,
+    IQuery,
     Pagination,
     Status,
 } from "@/shared/index.js";
@@ -17,12 +18,14 @@ export const getAllCouponsHandler: RequestHandler<
     null,
     string | GetDataWithPagination<ICoupon>,
     null,
-    Status & Pagination
+    Status & Pagination & IQuery
 > = async (req, res) => {
     const reqStatus = req.query.status;
+    const query = req.query.query || "";
 
     const pagination = paginationHandler(req);
     const { status, data, error } = await couponStore.getAllCoupons({
+        query,
         status: reqStatus ? Number(reqStatus) : undefined,
         pagination,
     });

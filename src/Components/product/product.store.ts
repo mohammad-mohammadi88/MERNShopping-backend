@@ -1,9 +1,11 @@
 import type { Images } from "@/services/cloudinary/request.js";
 import {
     type GetDataFns,
+    type IQuery,
     type Pagination,
     errorHandler,
     paginateData,
+    searchFields,
 } from "@/shared/index.js";
 import productModel from "./product.model.js";
 import type {
@@ -12,10 +14,11 @@ import type {
 } from "./product.validate.js";
 import type IProduct from "./schema/product.d.js";
 
-const getterFns: GetDataFns<IProduct> = {
-    getDataFn: () => productModel.find(),
+const getterFns = (query: string): GetDataFns<IProduct> => ({
+    getDataFn: () =>
+        productModel.find({ $or: searchFields<IProduct>(["title"], query) }),
     getCountFn: () => productModel.countDocuments(),
-};
+});
 class ProductStore {
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => productModel.create(data), "creating new product", {
@@ -43,8 +46,8 @@ class ProductStore {
         );
     };
 
-    getProducts = (pagination?: Required<Pagination>) =>
-        paginateData(getterFns, "product", pagination);
+    getProducts = ({ query, ...pagination }: Required<Pagination> & IQuery) =>
+        paginateData(getterFns(query), "product", pagination);
 
     editProduct = (id: string, data: EditProductSchema & Images) =>
         errorHandler(

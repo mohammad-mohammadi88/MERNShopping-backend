@@ -28,18 +28,13 @@ const DiscountSchema = new Schema(
     { _id: false }
 );
 
-const ConstraintsSchema = new Schema(
-    { user: reference("User") },
-    { _id: false }
-);
-
 const CouponSchema = new Schema<ICoupon>(
     {
         code: { type: String, required: true, unique: true },
         discount: { type: DiscountSchema, required: true },
         limit: { type: Number, required: true },
         used: { type: Number, required: true, default: 0 },
-        constraints: { type: ConstraintsSchema, required: true },
+        user: reference("User"),
         status: statusSchema(couponStatus),
         expiresAt: {
             type: Date,

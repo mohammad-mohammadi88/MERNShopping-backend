@@ -17,11 +17,6 @@ const discountSchema = z
 
 export type Discount = z.infer<typeof discountSchema>;
 
-const constraintsSchema = z.object({
-    user: userSchema,
-});
-export type Constraints = z.infer<typeof constraintsSchema>;
-
 export const postCouponSchema = z.object({
     discount: discountSchema,
     limit: z.number().nonnegative().int("limit cannot be a float"),
@@ -32,6 +27,6 @@ export const postCouponSchema = z.object({
         }
         return val;
     }, z.date()),
-    constraints: constraintsSchema,
+    user: userSchema,
 });
 export type PostCouponSchema = z.infer<typeof postCouponSchema>;

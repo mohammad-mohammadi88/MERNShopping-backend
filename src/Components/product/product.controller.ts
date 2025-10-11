@@ -28,7 +28,6 @@ const postProductCTRL: RequestHandler<
     string | IProduct,
     PostProductSchema
 > = async (req, res) => {
-    console.log("body", req.body);
     const { status: categoryStatus, error: categoryError } =
         // default action is increase
         await productCategoryStore.changeProductCount(
