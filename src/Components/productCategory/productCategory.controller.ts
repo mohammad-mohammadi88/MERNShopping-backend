@@ -4,6 +4,7 @@ import validate from "@/middlewares/validate.js";
 import {
     paginationHandler,
     type GetDataWithPagination,
+    type IQuery,
     type Pagination,
 } from "@/shared/index.js";
 import productCategoryStore from "./productCategory.store.js";
@@ -35,9 +36,11 @@ export const getCategoriesHandler: RequestHandler<
     null,
     string | GetDataWithPagination<IProductCategory>,
     null,
-    Pagination
+    Pagination & IQuery
 > = async (req, res) => {
+    const query = req.query.query || "";
     const { status, data, error } = await productCategoryStore.getCategories(
+        query,
         paginationHandler(req)
     );
     return res.status(status).send(error || data);

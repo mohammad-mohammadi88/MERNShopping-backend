@@ -5,6 +5,7 @@ import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.j
 import {
     paginationHandler,
     type GetDataWithPagination,
+    type IQuery,
     type Pagination,
     type Status,
 } from "@/shared/index.js";
@@ -110,13 +111,15 @@ export const getAllOrdersHandler: RequestHandler<
     null,
     string | GetDataWithPagination<IOrder>,
     null,
-    Status & Pagination
+    Status & Pagination & IQuery
 > = async (req, res) => {
     const reqStatus = req.query.status;
+    const query = req.query.query || "";
 
     const pagination = paginationHandler(req);
     const { status, data, error } = await ordersStore.getAllOrders({
         status: reqStatus ? Number(reqStatus) : undefined,
+        query,
         pagination,
     });
     return res.status(status).send(data || error);

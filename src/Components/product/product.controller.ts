@@ -9,6 +9,7 @@ import {
 import {
     paginationHandler,
     type GetDataWithPagination,
+    type IQuery,
     type Pagination,
 } from "@/shared/index.js";
 import productCategoryStore from "@P_Category/productCategory.store.js";
@@ -55,9 +56,12 @@ export const getAllProductsHandler: RequestHandler<
     null,
     string | GetDataWithPagination<IProduct>,
     null,
-    Pagination
+    Pagination & IQuery
 > = async (req, res) => {
+    const query = req.query.query || "";
+
     const { status, data, error } = await productStore.getProducts(
+        query,
         paginationHandler(req)
     );
     return res.status(status).send(error || data);

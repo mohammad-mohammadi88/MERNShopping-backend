@@ -4,15 +4,22 @@ import {
     type GetDataFns,
     paginateData,
     type Pagination,
+    searchFields,
 } from "@/shared/index.js";
 import productCategoryModel from "./productCategory.model.js";
 import type { PostCategorySchema } from "./productCategory.validate.js";
 import type IProductCategory from "./schema/productCategory.d.js";
 
-const getterFns: GetDataFns<IProductCategory> = {
+const getterFns = (query: string): GetDataFns<IProductCategory> => ({
     getCountFn: () => productCategoryModel.countDocuments(),
-    getDataFn: () => productCategoryModel.find(),
-};
+    getDataFn: () =>
+        productCategoryModel.find({
+            $or: searchFields(
+                ["title", "attrGroups.title", "attrGroups.attrs"],
+                query
+            ),
+        }),
+});
 class ProductCategoryStore {
     addCategory = (body: PostCategorySchema) =>
         errorHandler(
@@ -21,9 +28,9 @@ class ProductCategoryStore {
             { successStatus: 201 }
         );
 
-    getCategories = (pagination?: Required<Pagination>) =>
+    getCategories = (query: string, pagination?: Required<Pagination>) =>
         paginateData<IProductCategory>(
-            getterFns,
+            getterFns(query),
             "product category",
             pagination
         );

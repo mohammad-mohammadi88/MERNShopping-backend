@@ -1,12 +1,12 @@
 import type { Images } from "@/services/cloudinary/request.js";
 import {
     type GetDataFns,
-    type IQuery,
     type Pagination,
     errorHandler,
     paginateData,
     searchFields,
 } from "@/shared/index.js";
+import type { PipelineStage } from "mongoose";
 import productModel from "./product.model.js";
 import type {
     EditProductSchema,
@@ -14,12 +14,41 @@ import type {
 } from "./product.validate.js";
 import type IProduct from "./schema/product.d.js";
 
-const getterFns = (query: string): GetDataFns<IProduct> => ({
-    getDataFn: () =>
-        productModel.find({ $or: searchFields<IProduct>(["title"], query) }),
-    getCountFn: () => productModel.countDocuments(),
-});
 class ProductStore {
+    private getterFns = (query: string): GetDataFns<IProduct> => ({
+        getDataFn: () => this.searchData(query) as any,
+        getCountFn: () => productModel.countDocuments(),
+    });
+
+    getProducts = (query: string, pagination?: Required<Pagination>) =>
+        paginateData<IProduct>(this.getterFns(query), "coupon", pagination);
+
+    private searchData = (query: string) => {
+        const userFields = [
+            "title",
+            "productCategory.title",
+            "attrs.title",
+            "attrs.description",
+        ];
+        const pipeline: PipelineStage[] = [
+            {
+                $lookup: {
+                    from: "productcategories",
+                    localField: "productCategory",
+                    foreignField: "_id",
+                    as: "productCategory",
+                },
+            },
+            { $unwind: "$productCategory" },
+        ];
+        const orConditions = searchFields(userFields, query);
+        if (orConditions.length > 0 && query.trim() !== "") {
+            pipeline.push({ $match: { $or: orConditions } });
+        }
+
+        return productModel.aggregate(pipeline);
+    };
+
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => productModel.create(data), "creating new product", {
             successStatus: 201,
@@ -36,7 +65,7 @@ class ProductStore {
         return errorHandler(
             async () =>
                 await productModel.findOneAndUpdate(
-                    { _id, $gte },
+                    { _id, quantity: { $gte } },
                     { $inc: { quantity: quantityEffect } }
                 ),
             `${action}ing product quantity with id #${_id}`,
@@ -45,9 +74,6 @@ class ProductStore {
             }
         );
     };
-
-    getProducts = ({ query, ...pagination }: Required<Pagination> & IQuery) =>
-        paginateData(getterFns(query), "product", pagination);
 
     editProduct = (id: string, data: EditProductSchema & Images) =>
         errorHandler(
