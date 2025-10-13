@@ -1,5 +1,5 @@
 import {
-    type GetDataFns,
+    type GetDataFn,
     type IQuery,
     type PaginationWithStatus,
     errorHandler,
@@ -7,6 +7,7 @@ import {
     searchFields,
 } from "@/shared/index.js";
 import type { PipelineStage } from "mongoose";
+import couponModel from "../coupon/coupon.model.js";
 import { default as OrderModel, default as orderModel } from "./order.model.js";
 import type { PostOrderSchema } from "./order.validate.js";
 import type IOrder from "./schema/order.d.js";
@@ -24,17 +25,13 @@ class OrderStore {
     }: PaginationWithStatus & GetterFnParams) =>
         paginateData<IOrder>(this.getterFns(params), "order", pagination);
 
-    private getterFns = ({
-        query,
-        status,
-    }: GetterFnParams): GetDataFns<IOrder> => ({
-        getDataFn: () =>
+    private getterFns =
+        ({ query, status }: GetterFnParams): GetDataFn<IOrder> =>
+        () =>
             this.searchData(
                 query,
                 status ? [{ $match: { status } }] : undefined
-            ) as any,
-        getCountFn: () => orderModel.countDocuments(),
-    });
+            ) as any;
 
     private searchData = (
         query: string,
@@ -95,9 +92,26 @@ class OrderStore {
         errorHandler(() => OrderModel.countDocuments(), "getting orders count");
 
     getOrder = (id: string) =>
-        errorHandler(() => OrderModel.findById(id), "getting one order", {
-            notFoundError: `Order with id #${id} doesn't exists`,
-        });
+        errorHandler(
+            async () => {
+                const order = await orderModel
+                    .findById(id)
+                    .lean()
+                    .populate(["user", "products.product"]);
+                if (!order) return null;
+                if (order.couponCode) {
+                    const coupon = await couponModel
+                        .findOne({ code: order.couponCode })
+                        .lean();
+                    order.couponCode = coupon as any;
+                }
+                return order;
+            },
+            "getting one order",
+            {
+                notFoundError: `Order with id #${id} doesn't exists`,
+            }
+        );
 
     editOrderStatus = (id: string, status: number) =>
         errorHandler(
