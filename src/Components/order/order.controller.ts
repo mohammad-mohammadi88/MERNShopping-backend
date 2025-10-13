@@ -1,7 +1,6 @@
 import type { RequestHandler } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
-import CouponValidator from "@/services/coupon/CouponValidator/CouponValidator.js";
 import {
     paginationHandler,
     type GetDataWithPagination,
@@ -10,6 +9,7 @@ import {
     type Status,
 } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
+import CouponValidator from "@Coupon/CouponValidator/CouponValidator.js";
 import productStore from "@Product/product.store.js";
 import userStore from "@User/user.store.js";
 import ordersStatus from "./order.status.js";

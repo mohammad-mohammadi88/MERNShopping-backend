@@ -1,20 +1,14 @@
 import {
     type Action,
     errorHandler,
-    type GetDataFns,
     paginateData,
     type Pagination,
 } from "@/shared/index.js";
-import type IUser from "./schema/user.d.js";
 import userModel from "./user.model.js";
 
-const getterFns: GetDataFns<IUser> = {
-    getCountFn: () => userModel.countDocuments(),
-    getDataFn: () => userModel.find(),
-};
 class UserStore {
     getAllUsers = (pagination?: Required<Pagination>) =>
-        paginateData(getterFns, "user", pagination);
+        paginateData(() => userModel.find(), "user", pagination);
 
     postUser = (data: any) =>
         errorHandler(() => userModel.create(data), "creating new user", {

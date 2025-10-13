@@ -2,7 +2,7 @@ import type { PipelineStage } from "mongoose";
 
 import type {
     Action,
-    GetDataFns,
+    GetDataFn,
     IQuery,
     PaginationWithStatus,
 } from "@/shared/index.js";
@@ -18,23 +18,19 @@ const couponNotFound = (code: string): string =>
 
 type GetterFnParams = { status: number | undefined } & IQuery;
 class CouponStore {
-    private getterFns = ({
-        query,
-        status,
-    }: GetterFnParams): GetDataFns<ICoupon> => ({
-        getDataFn: () =>
+    private getDataFn =
+        ({ query, status }: GetterFnParams): GetDataFn<ICoupon> =>
+        () =>
             this.searchData(
                 query,
                 status ? [{ $match: { status } }] : undefined
-            ) as any,
-        getCountFn: () => couponModel.countDocuments(),
-    });
+            ) as any;
 
     getAllCoupons = ({
         pagination,
         ...params
     }: PaginationWithStatus & GetterFnParams) =>
-        paginateData<ICoupon>(this.getterFns(params), "coupon", pagination);
+        paginateData<ICoupon>(this.getDataFn(params), "coupon", pagination);
 
     private searchData = (
         query: string,

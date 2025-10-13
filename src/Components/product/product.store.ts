@@ -1,12 +1,12 @@
+import type { PipelineStage } from "mongoose";
+
 import type { Images } from "@/services/cloudinary/request.js";
 import {
-    type GetDataFns,
     type Pagination,
     errorHandler,
     paginateData,
     searchFields,
 } from "@/shared/index.js";
-import type { PipelineStage } from "mongoose";
 import productModel from "./product.model.js";
 import type {
     EditProductSchema,
@@ -15,13 +15,12 @@ import type {
 import type IProduct from "./schema/product.d.js";
 
 class ProductStore {
-    private getterFns = (query: string): GetDataFns<IProduct> => ({
-        getDataFn: () => this.searchData(query) as any,
-        getCountFn: () => productModel.countDocuments(),
-    });
-
     getProducts = (query: string, pagination?: Required<Pagination>) =>
-        paginateData<IProduct>(this.getterFns(query), "coupon", pagination);
+        paginateData<IProduct>(
+            () => this.searchData(query) as any,
+            "coupon",
+            pagination
+        );
 
     private searchData = (query: string) => {
         const userFields = [
