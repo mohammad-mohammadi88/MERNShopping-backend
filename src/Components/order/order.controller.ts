@@ -1,6 +1,7 @@
 import type { RequestHandler } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
+import { CouponValidator } from "@/services/index.js";
 import {
     paginationHandler,
     type GetDataWithPagination,
@@ -9,7 +10,6 @@ import {
     type Status,
 } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
-import CouponValidator from "@Coupon/CouponValidator/CouponValidator.js";
 import productStore from "@Product/product.store.js";
 import userStore from "@User/user.store.js";
 import ordersStatus from "./order.status.js";
@@ -21,6 +21,7 @@ import {
     type PostOrderSchema,
 } from "./order.validate.js";
 import type IOrder from "./schema/order.d.js";
+import { StatusValidator } from "./service/index.js";
 
 const calcPercent = (price: number, percent: number): number =>
     price * (percent / 100);
@@ -160,17 +161,12 @@ const editOrderStatusCTRL: RequestHandler<
     if (orderError) return res.status(orderStatus).send(orderError);
     if (!prevOrder) return;
 
-    if (prevOrder?.status >= status)
-        return res
-            .status(406)
-            .send("You cannot change the status to previous status");
-
-    if (
-        prevOrder?.status === ordersStatus.RECEIVED ||
-        prevOrder?.status === ordersStatus.CANCELED
-    ) {
-        const orderStatusError = `Received = ${ordersStatus.RECEIVED} and Cenceled = ${ordersStatus.CANCELED} order statuses are not editable`;
-        return res.status(406).send(orderStatusError);
+    try {
+        const validator = new StatusValidator();
+        validator.handler(status as any, prevOrder.status);
+    } catch (e) {
+        const error = (e as Error).message;
+        return res.status(400).send(error);
     }
 
     if (status === ordersStatus.CANCELED) {

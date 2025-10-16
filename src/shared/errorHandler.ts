@@ -31,6 +31,7 @@ export default async <T>(
         }
         return { data: result, status: successStatus };
     } catch (e: any) {
+        console.log(action, e);
         const error =
             typeof e === "string"
                 ? e

@@ -12,6 +12,7 @@ export { default as reference } from "./reference.js";
 export * from "./schema.js";
 export { default as searchFields } from "./searchFields.js";
 export { default as statusSchema } from "./statusSchema.js";
+export { default as statusToString } from "./statusToString.js";
 export { default as urlToPublicId } from "./urlToPublicId.js";
 
 // I will use it as `${action}ing`

@@ -18,12 +18,16 @@ class ProductCategoryStore {
         );
 
     private getDataFn = (query: string) => () =>
-        productCategoryModel.find({
-            $or: searchFields(
-                ["title", "attrGroups.title", "attrGroups.attrs"],
-                query
-            ),
-        });
+        productCategoryModel.find(
+            query !== ""
+                ? {
+                      $or: searchFields(
+                          ["title", "attrGroups.title", "attrGroups.attrs"],
+                          query
+                      ),
+                  }
+                : {}
+        );
 
     getCategories = (query: string, pagination?: Required<Pagination>) =>
         paginateData<IProductCategory>(
@@ -62,3 +66,7 @@ class ProductCategoryStore {
 }
 
 export default new ProductCategoryStore();
+
+const hello = (para?: string) => para;
+
+hello(undefined);
