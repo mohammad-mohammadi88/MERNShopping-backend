@@ -2,7 +2,7 @@ import express from "express";
 
 import {
     getAllCouponsHandler,
-    getCouponWithIdHandler,
+    getCouponWithCodeHandler,
     postCouponHandler,
 } from "./coupon.controller.js";
 
@@ -10,6 +10,6 @@ const router = express.Router();
 
 router.get("/", getAllCouponsHandler);
 router.post("/", postCouponHandler);
-router.get("/:id", getCouponWithIdHandler);
+router.get("/:code", getCouponWithCodeHandler);
 
 export default router;

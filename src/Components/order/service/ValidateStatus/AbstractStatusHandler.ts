@@ -1,5 +1,6 @@
 import type { OrderStatusValue } from "../../order.status.js";
 import type StatusHandler from "./StatusHandler.js";
+import type { OrderProcess } from "./StatusHandler.js";
 
 export default abstract class AbstractStatusHandler implements StatusHandler {
     private nextHandler: StatusHandler | undefined;
@@ -10,9 +11,9 @@ export default abstract class AbstractStatusHandler implements StatusHandler {
     public process(
         newStatus: OrderStatusValue,
         oldStatus: OrderStatusValue
-    ): boolean {
+    ): OrderProcess {
         return this.nextHandler
             ? this.nextHandler?.process(newStatus, oldStatus)
-            : true;
+            : this.process;
     }
 }

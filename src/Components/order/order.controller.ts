@@ -21,6 +21,7 @@ import {
     type PostOrderSchema,
 } from "./order.validate.js";
 import type IOrder from "./schema/order.d.js";
+import type { FullOrder } from "./schema/order.d.js";
 import { StatusValidator } from "./service/index.js";
 
 const calcPercent = (price: number, percent: number): number =>
@@ -129,7 +130,7 @@ export const getAllOrdersHandler: RequestHandler<
 // get order by id
 export const getOrderByIdHandler: RequestHandler<
     { id: string },
-    string | IOrder
+    string | FullOrder
 > = async (req, res) => {
     const { status, data, error } = await ordersStore.getOrder(req.params.id);
     return res.status(status).send(data || error);
@@ -174,7 +175,7 @@ const editOrderStatusCTRL: RequestHandler<
         if (prevOrder.couponCode) {
             const { status: couponStatus, error: couponError } =
                 await couponStore.changeCouponUsedTimes(
-                    prevOrder.couponCode,
+                    prevOrder.couponCode.code,
                     "decreas"
                 );
             if (couponError) return res.status(couponStatus).send(couponError);

@@ -50,11 +50,13 @@ export const postCouponHandler: any[] = [
     postCouponCTRL,
 ];
 
-// get coupon with id
-export const getCouponWithIdHandler: RequestHandler<
-    { id: string },
+// get coupon with code
+export const getCouponWithCodeHandler: RequestHandler<
+    { code: string },
     string | ICoupon
 > = async (req, res) => {
-    const { status, data, error } = await couponStore.getCoupon(req.params.id);
+    const { status, data, error } = await couponStore.getCoupon(
+        req.params.code
+    );
     return res.status(status).send(data || error);
 };

@@ -5,11 +5,11 @@ import AbstractStatusHandler from "../AbstractStatusHandler.js";
 
 // ended statuses are "RECEIVED" and "CANCELED"
 export default class EndedStatusesToPrevious extends AbstractStatusHandler {
-    public process(_: any, oldStatus: OrderStatusValue): boolean {
+    public process(newStatus: any, oldStatus: OrderStatusValue) {
         const isEndedStatus =
             oldStatus === ordersStatus.CANCELED ||
             oldStatus === ordersStatus.RECEIVED;
-        if (!isEndedStatus) return true;
+        if (!isEndedStatus) return super["process"](newStatus, oldStatus);
 
         // I will make sure an invalid status doesn't pass
         const statusText = capitalize(statusToString(ordersStatus, oldStatus)!);

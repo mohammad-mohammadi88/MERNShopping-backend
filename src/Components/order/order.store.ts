@@ -11,6 +11,7 @@ import couponModel from "../coupon/coupon.model.js";
 import { default as OrderModel, default as orderModel } from "./order.model.js";
 import type { PostOrderSchema } from "./order.validate.js";
 import type IOrder from "./schema/order.d.js";
+import type { FullOrder } from "./schema/order.d.js";
 
 type PostOrderData = PostOrderSchema & {
     totalPrice: number;
@@ -30,7 +31,7 @@ class OrderStore {
         () =>
             this.searchData(
                 query,
-                status ? [{ $match: { status } }] : undefined
+                status !== undefined ? [{ $match: { status } }] : undefined
             ) as any;
 
     private searchData = (
@@ -93,7 +94,7 @@ class OrderStore {
 
     getOrder = (id: string) =>
         errorHandler(
-            async () => {
+            async (): Promise<FullOrder | null> => {
                 const order = await orderModel
                     .findById(id)
                     .lean()
@@ -105,7 +106,7 @@ class OrderStore {
                         .lean();
                     order.couponCode = coupon as any;
                 }
-                return order;
+                return order as FullOrder;
             },
             "getting one order",
             {

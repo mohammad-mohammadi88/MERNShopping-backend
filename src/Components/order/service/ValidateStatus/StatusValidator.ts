@@ -1,20 +1,23 @@
 import {
     EndedStatusesToPrevious,
-    InitNotToCanceled,
     InvalidStatus,
+    OtherToInit,
+    SameStatus,
 } from "./handlers/index.js";
 import type { OrderProcess } from "./StatusHandler.d.js";
 
 export default class StatusValidator {
     handler: OrderProcess = (newStatus, oldStatus) => {
+        const sameStatus = new SameStatus();
+        const otherToInit = new OtherToInit();
         const invalidHandler = new InvalidStatus();
-        const initToCanceledHandler = new InitNotToCanceled();
         const endedStatusHandler = new EndedStatusesToPrevious();
 
-        invalidHandler
-            .setNext(initToCanceledHandler)
+        sameStatus
+            .setNext(invalidHandler)
+            .setNext(otherToInit)
             .setNext(endedStatusHandler);
 
-        return invalidHandler.process(newStatus, oldStatus);
+        return sameStatus.process(newStatus, oldStatus);
     };
 }

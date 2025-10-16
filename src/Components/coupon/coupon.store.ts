@@ -23,7 +23,7 @@ class CouponStore {
         () =>
             this.searchData(
                 query,
-                status ? [{ $match: { status } }] : undefined
+                status !== undefined ? [{ $match: { status } }] : undefined
             ) as any;
 
     getAllCoupons = ({
