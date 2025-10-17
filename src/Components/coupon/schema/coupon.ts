@@ -4,6 +4,7 @@ import { errorHandler, reference, statusSchema } from "@/shared/index.js";
 import couponStatus from "../coupon.status.js";
 import type ICoupon from "./coupon.d.js";
 
+export { type ICoupon };
 const DiscountSchema = new Schema(
     {
         role: { type: String, enum: ["number", "percent"], required: true },

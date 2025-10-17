@@ -9,9 +9,13 @@ import type {
 } from "@/shared/index.js";
 import paginationHandler from "@/shared/paginationHandler.js";
 import couponCodeGenerator from "@Coupon/couponCodeGenerator.js";
-import couponStore, { type Code } from "./coupon.store.js";
-import { postCouponSchema, type PostCouponSchema } from "./coupon.validate.js";
-import type ICoupon from "./schema/coupon.d.js";
+import {
+    couponStore,
+    postCouponSchema,
+    type Code,
+    type ICoupon,
+    type PostCouponSchema,
+} from "./index.js";
 
 // get all coupons
 export const getAllCouponsHandler: RequestHandler<

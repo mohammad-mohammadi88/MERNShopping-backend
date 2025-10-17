@@ -7,10 +7,12 @@ import type {
     PaginationWithStatus,
 } from "@/shared/index.js";
 import { errorHandler, paginateData, searchFields } from "@/shared/index.js";
-import couponModel from "./coupon.model.js";
-import couponStatus from "./coupon.status.js";
-import type { PostCouponSchema } from "./coupon.validate.js";
-import type ICoupon from "./schema/coupon.d.js";
+import {
+    couponModel,
+    couponStatus,
+    type ICoupon,
+    type PostCouponSchema,
+} from "./index.js";
 
 export type Code = { code: string };
 const couponNotFound = (code: string): string =>

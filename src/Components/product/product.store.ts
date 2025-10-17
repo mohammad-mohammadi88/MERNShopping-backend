@@ -2,17 +2,17 @@ import type { PipelineStage } from "mongoose";
 
 import type { Images } from "@/services/cloudinary/request.js";
 import {
-    type Pagination,
     errorHandler,
     paginateData,
     searchFields,
+    type Pagination,
 } from "@/shared/index.js";
-import productModel from "./product.model.js";
-import type {
-    EditProductSchema,
-    PostProductSchema,
-} from "./product.validate.js";
-import type IProduct from "./schema/product.d.js";
+import {
+    productModel,
+    type EditProductSchema,
+    type IProduct,
+    type PostProductSchema,
+} from "./index.js";
 
 class ProductStore {
     getProducts = (query: string, pagination?: Required<Pagination>) =>

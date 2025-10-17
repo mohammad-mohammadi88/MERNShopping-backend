@@ -1,4 +1,4 @@
-import type IProduct from "@Products/schema/products.d.js";
+import type IProduct from "@Product/schema/product.d.js";
 import type CartProvider from "./CartProvider.d.js";
 
 export default class CartMemoryProvider implements CartProvider {

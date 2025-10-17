@@ -4,7 +4,7 @@ import type { PaymentStatusValue } from "../payment.status.ts";
 export default interface IPayment extends Document {
     amount: number;
     createdAt: Date;
-    method: string;
+    isOnline: boolean;
     order: Types.ObjectId;
     reference: string;
     reserve: string;

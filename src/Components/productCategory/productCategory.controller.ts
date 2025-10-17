@@ -7,12 +7,12 @@ import {
     type IQuery,
     type Pagination,
 } from "@/shared/index.js";
-import productCategoryStore from "./productCategory.store.js";
 import {
     postCategorySchema,
+    productCategoryStore,
+    type IProductCategory,
     type PostCategorySchema,
-} from "./productCategory.validate.js";
-import type IProductCategory from "./schema/productCategory.d.js";
+} from "./index.js";
 
 // post category
 const postCategoryCTRL: RequestHandler<

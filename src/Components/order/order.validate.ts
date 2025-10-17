@@ -9,23 +9,12 @@ import ordersStatus from "./order.status.js";
 
 // orderProductCheck
 const orderProductCheck = async (values: OrderProductSchema): Promise<true> => {
-    const {
-        product: productId,
-        productPrice,
-        productSalePrice,
-        color,
-    } = values;
+    const { product: productId, color } = values;
     const count = values.count || 1;
 
     const errors = {
         count: new Error("count field should be integer and positive"),
         status: new Error(`Product with id #${productId} in not published`),
-        salePrice: new Error(
-            "productSalePrice field is not equal to the products salePrice"
-        ),
-        price: new Error(
-            "productPrice field is not equal to the products price"
-        ),
         color: new Error(
             `This color is not available for product with id #${productId}`
         ),
@@ -44,8 +33,6 @@ const orderProductCheck = async (values: OrderProductSchema): Promise<true> => {
 
     const validate: Record<ValidateKeys, boolean> = {
         status: product.status !== productsStatus.PUBLISHED,
-        salePrice: product.salePrice !== productSalePrice,
-        price: product.price !== productPrice,
         color:
             !color ||
             !product.colors.some(
@@ -69,8 +56,6 @@ export const orderProductSchema = z
         color: productColorSchema(z.number().nonnegative()).optional(),
         product: z.string().length(24),
         count: z.number().optional(),
-        productPrice: z.number().nonnegative(),
-        productSalePrice: z.number().nonnegative(),
     })
     .refine(orderProductCheck);
 export type OrderProductSchema = z.infer<typeof orderProductSchema>;

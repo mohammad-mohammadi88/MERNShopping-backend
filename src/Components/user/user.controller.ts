@@ -2,8 +2,7 @@ import type { RequestHandler } from "express";
 
 import type { GetDataWithPagination, Pagination } from "@/shared/index.js";
 import paginationHandler from "@/shared/paginationHandler.js";
-import type IUser from "./schema/user.d.js";
-import userStore from "./user.store.js";
+import { userStore, type IUser } from "./index.js";
 
 // get all users
 export const getUsersHandler: RequestHandler<

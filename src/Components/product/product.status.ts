@@ -1,4 +1,4 @@
-const productsStatus = {
+export const productsStatus = {
     INIT: 0,
     INACTIVE: 1,
     PUBLISHED: 2,

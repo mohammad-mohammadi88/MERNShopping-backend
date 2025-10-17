@@ -1,4 +1,6 @@
 import "dotenv/config";
+const frontendDomain = process.env.FRONTEND_DOMAIN!;
+
 export default {
     cloudinaryFolder: "mernShopping",
     maxGalleryLength: 3,
@@ -14,5 +16,11 @@ export default {
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
         api_secret: process.env.CLOUDINARY_API_SECRET!,
         api_key: process.env.CLOUDINARY_API_KEY!,
+    },
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY!,
+    frontend: {
+        domain: frontendDomain,
+        success_url: `${frontendDomain}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${frontendDomain}/cancel`,
     },
 };

@@ -66,7 +66,3 @@ class ProductCategoryStore {
 }
 
 export default new ProductCategoryStore();
-
-const hello = (para?: string) => para;
-
-hello(undefined);

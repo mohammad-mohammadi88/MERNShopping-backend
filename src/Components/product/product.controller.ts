@@ -13,14 +13,14 @@ import {
     type Pagination,
 } from "@/shared/index.js";
 import productCategoryStore from "@P_Category/productCategory.store.js";
-import productStore from "./product.store.js";
 import {
     editProductSchema,
     postProductSchema,
+    productStore,
     type EditProductSchema,
+    type IProduct,
     type PostProductSchema,
-} from "./product.validate.js";
-import type IProduct from "./schema/product.d.js";
+} from "./index.js";
 
 type ParamID = { id: string };
 // Post Product

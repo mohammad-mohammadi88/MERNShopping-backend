@@ -7,7 +7,7 @@ import type IProductColor from "./product.color.d.js";
 export default interface IProduct extends Document {
     title: string;
     price: number;
-    salePrice?: number;
+    salePrice: number;
     thumbnail: string;
     gallery?: string[];
     quantity: number;

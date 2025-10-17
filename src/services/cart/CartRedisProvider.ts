@@ -1,5 +1,5 @@
 import redisConnection from "@/shared/redis.js";
-import type ProductType from "@Products/schema/products.d.js";
+import type ProductType from "@Product/schema/product.d.js";
 import type CartConfig from "./CartConfig.js";
 import type CartProvider from "./CartProvider.js";
 

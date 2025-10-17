@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler, Response } from "express";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
 import { CouponValidator } from "@/services/index.js";
@@ -11,39 +11,78 @@ import {
 } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
 import productStore from "@Product/product.store.js";
+import type IProduct from "@Product/schema/product.d.js";
 import userStore from "@User/user.store.js";
-import ordersStatus from "./order.status.js";
-import ordersStore from "./order.store.js";
 import {
     editOrderStatusSchema,
+    ordersStatus,
+    ordersStore,
     postOrderSchema,
+    StatusValidator,
     type EditOrderStatusSchema,
+    type FullOrder,
+    type IOrder,
+    type IOrderProduct,
     type PostOrderSchema,
-} from "./order.validate.js";
-import type IOrder from "./schema/order.d.js";
-import type { FullOrder } from "./schema/order.d.js";
-import { StatusValidator } from "./service/index.js";
+} from "./index.js";
 
 const calcPercent = (price: number, percent: number): number =>
     price * (percent / 100);
 
 // post new order
+const handleCounpon = async (
+    priceUntilNow: number,
+    req: Request<null, string | IOrder, PostOrderSchema>,
+    res: Response
+) => {
+    const { couponCode, user } = req.body;
+    const {
+        status: couponStatus,
+        data: coupon,
+        error: couponError,
+    } = await couponStore.getCoupon(couponCode!);
+    if (couponError) throw res.status(couponStatus).send(couponError);
+    // this code will never return
+    if (!coupon) return 0;
+
+    try {
+        const validator = new CouponValidator();
+        await validator.handler(user, coupon);
+    } catch (e: unknown) {
+        const error = (e as Error).message;
+        throw res.status(400).send(error);
+    }
+
+    // change coupon used times
+    const { status: cStatus, error: cError } =
+        await couponStore.changeCouponUsedTimes(couponCode!);
+    if (cError) throw res.status(cStatus).send(cError);
+
+    const { amount, role } = coupon.discount;
+    const discountPrice =
+        role === "number" ? amount : calcPercent(priceUntilNow, amount);
+
+    return Math.round(Math.max(priceUntilNow - discountPrice, 0) * 100) / 100;
+};
 const postNewOrderCTRL: RequestHandler<
     null,
     string | IOrder,
     PostOrderSchema
 > = async (req, res) => {
-    const { products, couponCode } = req.body;
+    const { products: productsSampleInfo, couponCode } = req.body;
 
     // decrease product quantity count
-    const productsPromise = products.map(async ({ product, count }) => {
-        const { status: productStatus, error: productError } =
-            await productStore.changeProductQuantity(
-                product,
-                (count || 1) * -1
-            );
-        if (productError) throw res.status(productStatus).send(productError);
-    });
+    const productsPromise = productsSampleInfo.map(
+        async ({ product, count }) => {
+            const { status: productStatus, error: productError } =
+                await productStore.changeProductQuantity(
+                    product,
+                    (count || 1) * -1
+                );
+            if (productError)
+                throw res.status(productStatus).send(productError);
+        }
+    );
     await Promise.all(productsPromise);
 
     // increase user totalOrders
@@ -51,47 +90,46 @@ const postNewOrderCTRL: RequestHandler<
         await userStore.changeTotalOrdersCount(req.body.user);
     if (userError) return res.status(userStatus).send(userError);
 
-    const calcPrice = (
-        param: "productPrice" | "productSalePrice" = "productPrice"
-    ) =>
-        products.reduce(
+    interface FullInfoProducts extends Pick<IOrderProduct, "count" | "color"> {
+        product: IProduct;
+    }
+    const getProductsWithIds = productsSampleInfo.map(
+        async ({
+            product: productId,
+            color,
+            count,
+        }): Promise<FullInfoProducts> => {
+            const {
+                status,
+                data: product,
+                error,
+            } = await productStore.getProductById(productId);
+            if (error) throw res.status(status).send(error);
+            return {
+                product: product as unknown as IProduct,
+                count: count || 1,
+                color,
+            };
+        }
+    );
+    const orderedProducts = await Promise.all(getProductsWithIds);
+
+    const calcPrice = (param: "price" | "salePrice" = "price") =>
+        orderedProducts.reduce(
             (prev, current) =>
-                (current[param] + (current?.color?.priceEffect || 0)) *
+                (current.product[param] + (current?.color?.priceEffect || 0)) *
                     (current?.count || 1) +
                 prev,
             0
         );
     const totalPrice = calcPrice();
-    let finalPrice = calcPrice("productSalePrice");
+    let finalPrice = calcPrice("salePrice");
     if (couponCode) {
-        const {
-            status: couponStatus,
-            data: coupon,
-            error: couponError,
-        } = await couponStore.getCoupon(couponCode);
-        if (couponError) return res.status(couponStatus).send(couponError);
-        // this code will never return
-        if (!coupon) return;
-
         try {
-            const validator = new CouponValidator();
-            await validator.handler(req.body.user, coupon);
-        } catch (e: unknown) {
-            const error = (e as Error).message;
-            return res.status(400).send(error);
+            finalPrice = await handleCounpon(finalPrice, req, res);
+        } catch (e) {
+            return e;
         }
-
-        // change coupon used times
-        const { status: cStatus, error: cError } =
-            await couponStore.changeCouponUsedTimes(couponCode);
-        if (cError) return res.status(cStatus).send(cError);
-
-        const { amount, role } = coupon.discount;
-        const discountPrice =
-            role === "number" ? amount : calcPercent(finalPrice, amount);
-
-        finalPrice =
-            Math.round(Math.max(finalPrice - discountPrice, 0) * 100) / 100;
     }
     const newOrder = {
         ...req.body,
