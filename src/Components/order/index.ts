@@ -1,5 +1,5 @@
 export { default as ordersStatus } from "./order.status.js";
-export { default as ordersStore } from "./order.store.js";
+export { default as orderStore } from "./order.store.js";
 export {
     editOrderStatusSchema,
     postOrderSchema,

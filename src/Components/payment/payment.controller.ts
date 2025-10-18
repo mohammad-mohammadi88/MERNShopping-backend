@@ -1,50 +1,52 @@
+import { type RequestHandler, raw } from "express";
+
 import { paymentStripe } from "@/services/index.js";
-import type { RequestHandler } from "express";
-import type { IOrderProduct } from "../order/index.js";
-import type { PostOrderSchema } from "../order/order.validate.js";
-import { productStore, type IProduct } from "../product/index.js";
+import { type FullOrderProduct, orderStore } from "../order/index.js";
 
-export const createSession: RequestHandler<
+// create payment session
+export const createSessionHandler: RequestHandler<
     null,
-    string | any,
-    PostOrderSchema
+    string,
+    { orderId: string }
 > = async (req, res) => {
-    const { products: productsSampleInfo } = req.body;
+    const orderId = req.body.orderId;
+    const {
+        status: orderStatus,
+        data: order,
+        error: orderError,
+    } = await orderStore.getOrder(orderId);
+    if (orderError || !order) return res.status(orderStatus).send(orderError);
 
-    interface FullInfoProducts extends Pick<IOrderProduct, "count" | "color"> {
-        product: IProduct;
-    }
-    const getProductsWithIds = productsSampleInfo.map(
-        async ({
-            product: productId,
-            color,
-            count,
-        }): Promise<FullInfoProducts> => {
-            const {
-                status,
-                data: product,
-                error,
-            } = await productStore.getProductById(productId);
-            if (error) throw res.status(status).send(error);
-            return {
-                product: product as unknown as IProduct,
-                count: count || 1,
-                color,
-            };
-        }
-    );
-    const orderedProducts = await Promise.all(getProductsWithIds);
-    const calcPrice = (product: FullInfoProducts) =>
-        product.product.salePrice + (product?.color?.priceEffect || 0);
+    const calcPrice = (product: FullOrderProduct) =>
+        product.product + (product?.color?.priceEffect || 0);
 
     const result = await paymentStripe.createPaymentSession(
-        orderedProducts.map(({ count, product }) => ({
-            quantity: count,
-            amount: calcPrice({ count, product }),
-            image: product.thumbnail,
-            title: product.title,
-        }))
+        order.products.map((product) => {
+            const {
+                product: { thumbnail: image, title },
+                count: quantity,
+            } = product;
+            const amount = calcPrice(product);
+            return { quantity, amount, image, title };
+        }),
+        orderId
     );
-    console.log("🚀 ~ createSession ~ result:", result);
-    return res.json({ url: result.url });
+
+    return res.status(result.ok ? 200 : 500).send(result.data);
 };
+
+// update payment status
+const updatePaymentStatusCTRL: RequestHandler = async (req, res) => {
+    const { data, ok } = paymentStripe.webhook(req);
+
+    if (!ok) return res.status(500).send(data);
+    if (data.type === "checkout.session.completed") {
+        const session = data.data.object;
+    }
+
+    res.sendStatus(200);
+};
+export const updatePaymentStatusHandler: any[] = [
+    raw({ type: "application/json" }),
+    updatePaymentStatusCTRL,
+];

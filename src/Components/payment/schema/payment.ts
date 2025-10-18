@@ -1,20 +1,19 @@
 import { Schema } from "mongoose";
 
-import refrence from "@/shared/reference.js";
-import statusSchema from "@/shared/statusSchema.js";
+import { reference, statusSchema } from "@/shared/index.js";
 import ordersStore from "@Order/order.store.js";
 import paymentStatus from "../payment.status.js";
 import type IPayment from "./payment.d.js";
 
+export { type IPayment };
 const paymentSchema = new Schema<IPayment>(
     {
         amount: { type: Number },
-        isOnline: { type: Boolean, default: true },
-        order: refrence("Order"),
-        reference: { type: String, required: true },
-        reserve: { type: String, required: true },
+        order: reference("Order"),
+        stripeSessionId: { type: String, required: true },
+        currency: { type: String, required: true },
         status: statusSchema(paymentStatus),
-        user: refrence("User"),
+        user: reference("User"),
     },
     { timestamps: true }
 );

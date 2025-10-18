@@ -17,7 +17,10 @@ export default {
         api_secret: process.env.CLOUDINARY_API_SECRET!,
         api_key: process.env.CLOUDINARY_API_KEY!,
     },
-    stripeSecretKey: process.env.STRIPE_SECRET_KEY!,
+    stripe: {
+        stripeSecretKey: process.env.STRIPE_SECRET_KEY!,
+        stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
+    },
     frontend: {
         domain: frontendDomain,
         success_url: `${frontendDomain}/success?session_id={CHECKOUT_SESSION_ID}`,

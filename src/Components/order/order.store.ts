@@ -106,7 +106,7 @@ class OrderStore {
                         .lean();
                     order.couponCode = coupon as any;
                 }
-                return order as FullOrder;
+                return order as unknown as FullOrder;
             },
             "getting one order",
             {

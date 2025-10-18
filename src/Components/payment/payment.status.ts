@@ -1,4 +1,4 @@
-const paymentStatus = {
+export const paymentStatus = {
     PENDING: 0,
     SUCCESS: 1,
     FAILED: 2,
