@@ -13,10 +13,11 @@ import couponStore from "@Coupon/coupon.store.js";
 import productStore from "@Product/product.store.js";
 import type IProduct from "@Product/schema/product.d.js";
 import userStore from "@User/user.store.js";
+import type { ObjectId } from "mongoose";
 import {
     editOrderStatusSchema,
     ordersStatus,
-    ordersStore,
+    orderStore,
     postOrderSchema,
     StatusValidator,
     type EditOrderStatusSchema,
@@ -137,7 +138,7 @@ const postNewOrderCTRL: RequestHandler<
         finalPrice,
     };
 
-    const { status, data, error } = await ordersStore.postOrder(newOrder);
+    const { status, data, error } = await orderStore.postOrder(newOrder);
 
     return res.status(status).send(data || error);
 };
@@ -157,7 +158,7 @@ export const getAllOrdersHandler: RequestHandler<
     const query = req.query.query || "";
 
     const pagination = paginationHandler(req);
-    const { status, data, error } = await ordersStore.getAllOrders({
+    const { status, data, error } = await orderStore.getAllOrders({
         status: reqStatus ? Number(reqStatus) : undefined,
         query,
         pagination,
@@ -170,7 +171,7 @@ export const getOrderByIdHandler: RequestHandler<
     { id: string },
     string | FullOrder
 > = async (req, res) => {
-    const { status, data, error } = await ordersStore.getOrder(req.params.id);
+    const { status, data, error } = await orderStore.getOrder(req.params.id);
     return res.status(status).send(data || error);
 };
 
@@ -179,7 +180,7 @@ export const getOrdersCountHandler: RequestHandler<
     null,
     string | number
 > = async (_, res) => {
-    const { status, data, error } = await ordersStore.getOrdersCount();
+    const { status, data, error } = await orderStore.getOrdersCount();
     return res.status(status).send(data || error);
 };
 
@@ -196,7 +197,7 @@ const editOrderStatusCTRL: RequestHandler<
         status: orderStatus,
         data: prevOrder,
         error: orderError,
-    } = await ordersStore.getOrder(id);
+    } = await orderStore.getOrder(id);
     if (orderError) return res.status(orderStatus).send(orderError);
     if (!prevOrder) return;
 
@@ -222,7 +223,10 @@ const editOrderStatusCTRL: RequestHandler<
         const productsPromise = prevOrder.products.map(
             async ({ product, count }) => {
                 const { status: productStatus, error: productError } =
-                    await productStore.changeProductQuantity(product, count);
+                    await productStore.changeProductQuantity(
+                        (product._id as ObjectId).toString(),
+                        count
+                    );
                 if (productError)
                     throw res.status(productStatus).send(productError);
             }
@@ -234,7 +238,7 @@ const editOrderStatusCTRL: RequestHandler<
         status: statusCode,
         data,
         error,
-    } = await ordersStore.editOrderStatus(id, status);
+    } = await orderStore.editOrderStatus(id, status);
 
     if (data) data.status = status as any;
     return res.status(statusCode).send(data || error);

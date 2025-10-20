@@ -5,6 +5,7 @@ import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 
+import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
 import { defaults, mongooseConnection } from "./shared/index.js";
 
 const app = express();
@@ -15,6 +16,9 @@ const app = express();
 
     // config cloudinary
     cloudinary.config(defaults.cloudinary);
+
+    // stripe webhook
+    app.post("/payment/webhookSessionCheck", updatePaymentStatusHandler);
 
     // middleware
     app.use(helmet());

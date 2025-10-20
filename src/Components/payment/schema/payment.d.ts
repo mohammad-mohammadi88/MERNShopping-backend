@@ -8,6 +8,8 @@ export default interface IPayment extends Document {
     status: PaymentStatusValue;
     amount: number;
     stripeSessionId: string;
+    paidAmount?: number;
+    paymentId?: string;
     currency: string;
     createdAt: Date;
 }

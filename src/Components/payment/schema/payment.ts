@@ -8,10 +8,12 @@ import type IPayment from "./payment.d.js";
 export { type IPayment };
 const paymentSchema = new Schema<IPayment>(
     {
-        amount: { type: Number },
+        amount: { type: Number, required: true },
         order: reference("Order"),
         stripeSessionId: { type: String, required: true },
+        paymentId: { type: String, required: false },
         currency: { type: String, required: true },
+        paidAmount: { type: Number, required: false },
         status: statusSchema(paymentStatus),
         user: reference("User"),
     },
