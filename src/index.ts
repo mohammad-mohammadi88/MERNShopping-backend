@@ -18,7 +18,7 @@ const app = express();
     cloudinary.config(defaults.cloudinary);
 
     // stripe webhook
-    app.post("/payment/webhookSessionCheck", updatePaymentStatusHandler);
+    app.post("/payments/webhookSessionCheck", updatePaymentStatusHandler);
 
     // middleware
     app.use(helmet());

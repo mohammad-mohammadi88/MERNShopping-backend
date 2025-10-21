@@ -1,4 +1,4 @@
-const ordersStatus = {
+export const ordersStatus = {
     INIT: 0,
     PAID: 1,
     PROCESSING: 2,

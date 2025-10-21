@@ -1,4 +1,5 @@
-export { default as ordersStatus } from "./order.status.js";
+export { default as orderModel } from "./order.model.js";
+export * from "./order.status.js";
 export { default as orderStore } from "./order.store.js";
 export {
     editOrderStatusSchema,

@@ -16,6 +16,6 @@ appRouter.use("/offers", productOffersRouter);
 appRouter.use("/orders", orderRouter);
 appRouter.use("/products", productRouter);
 appRouter.use("/users", userRouter);
-appRouter.use("/payment", paymentRouter);
+appRouter.use("/payments", paymentRouter);
 
 export default appRouter;

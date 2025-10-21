@@ -8,7 +8,7 @@ import userModel from "./user.model.js";
 
 class UserStore {
     getAllUsers = (pagination?: Required<Pagination>) =>
-        paginateData(() => userModel.find(), "user", pagination);
+        paginateData(() => userModel.find(), "users", pagination);
 
     postUser = (data: any) =>
         errorHandler(() => userModel.create(data), "creating new user", {

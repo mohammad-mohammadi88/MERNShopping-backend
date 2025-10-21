@@ -1,17 +1,27 @@
 import { type RequestHandler, raw } from "express";
+import type { ObjectId } from "mongoose";
+import type Stripe from "stripe";
 
 import { paymentStripe } from "@/services/index.js";
-import type Stripe from "stripe";
+import type {
+    GetDataWithPagination,
+    IQuery,
+    Pagination,
+    Status,
+} from "@/shared/index.js";
+import paginationHandler from "@/shared/paginationHandler.js";
 import {
     type FullOrderProduct,
     ordersStatus,
     orderStore,
-} from "../order/index.js";
-import paymentStatus from "./payment.status.js";
-import paymentStore, {
+} from "@Order/index.js";
+import {
+    type IPayment,
     type NewPaymentData,
     type UpdatePaymentData,
-} from "./payment.store.js";
+    paymentStatus,
+    paymentStore,
+} from "./index.js";
 
 // create payment session
 export const createSessionHandler: RequestHandler<
@@ -57,7 +67,19 @@ export const createSessionHandler: RequestHandler<
         currency: session.currency || "usd",
         stripeSessionId: session.id,
     };
-    const { status, error } = await paymentStore.addNewPayment(newPayment);
+    // add new payment to database
+    const {
+        status: paymentStatus,
+        error: paymentError,
+        data: payment,
+    } = await paymentStore.addNewPayment(newPayment);
+    if (paymentError) return res.status(paymentStatus).send(paymentError);
+
+    // connect new payment to the order
+    const { status, error } = await orderStore.addPaymentId(
+        orderId,
+        (payment?._id as ObjectId).toString()
+    );
     if (error) return res.status(status).send(error);
 
     return res.status(201).send(session.url!);
@@ -67,12 +89,15 @@ export const createSessionHandler: RequestHandler<
 const handleSuccess = async (event: Stripe.Event) => {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.client_reference_id!;
+    if (orderId.length !== 24) return;
+
     const paymentInfo = await paymentStripe.getPaymentInfo(session);
     // @ts-ignore
     const updatePaymentInfo: UpdatePaymentData = {
         ...paymentInfo,
         status: paymentStatus.SUCCESS,
     };
+    await orderStore.editOrderStatus(orderId, ordersStatus.PAID);
     await paymentStore.updatePayment(orderId, updatePaymentInfo);
 };
 const handleFail = (orderId: string) =>
@@ -80,15 +105,16 @@ const handleFail = (orderId: string) =>
 
 const updatePaymentStatusCTRL: RequestHandler = async (req, res) => {
     const { data: event, ok } = paymentStripe.webhook(req);
-    console.dir(event, { depth: null });
 
     if (!ok) return res.status(500).send(event);
     switch (event.type) {
         case "checkout.session.completed":
+        case "payment_intent.succeeded":
             await handleSuccess(event);
         case "payment_intent.canceled":
         case "payment_intent.payment_failed":
-            await handleFail(event.data.object?.id!);
+            // @ts-ignore
+            await handleFail(event.data.object?.client_reference_id);
         default:
             break;
     }
@@ -99,3 +125,22 @@ export const updatePaymentStatusHandler: any[] = [
     raw({ type: "application/json" }),
     updatePaymentStatusCTRL,
 ];
+
+// get all payments
+export const getAllPaymentsHandler: RequestHandler<
+    null,
+    string | GetDataWithPagination<IPayment>,
+    null,
+    Status & Pagination & IQuery
+> = async (req, res) => {
+    const reqStatus = req.query.status;
+    const query = req.query.query || "";
+
+    const pagination = paginationHandler(req);
+    const { status, data, error } = await paymentStore.getAllPayments({
+        status: reqStatus ? Number(reqStatus) : undefined,
+        query,
+        pagination,
+    });
+    return res.status(status).send(data || error);
+};

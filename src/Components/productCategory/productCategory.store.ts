@@ -32,7 +32,7 @@ class ProductCategoryStore {
     getCategories = (query: string, pagination?: Required<Pagination>) =>
         paginateData<IProductCategory>(
             this.getDataFn(query),
-            "product category",
+            "product categories",
             pagination
         );
 

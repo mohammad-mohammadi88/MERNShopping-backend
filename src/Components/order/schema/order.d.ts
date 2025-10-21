@@ -1,10 +1,13 @@
 import type { Document, Types } from "mongoose";
 
-import type ICoupon from "@Coupon/schema/coupon.d.js";
-import type { OrderStatusValue } from "../order.status.ts";
-import type { PostOrderSchema } from "../order.validate.ts";
-import type IOrderProduct from "./order.product.d.js";
-import type { FullOrderProduct } from "./order.product.d.js";
+import type { ICoupon } from "@Coupon/index.js";
+import type { IPayment } from "@Payment/index.js";
+import type {
+    FullOrderProduct,
+    IOrderProduct,
+    OrderStatusValue,
+    PostOrderSchema,
+} from "../index.js";
 
 type IOrder = Omit<PostOrderSchema, "products"> &
     Document & {
@@ -14,10 +17,12 @@ type IOrder = Omit<PostOrderSchema, "products"> &
         finalPrice: number;
         createdAt: Date;
         updatedAt: Date;
+        payment?: Types.ObjectId;
         status: OrderStatusValue;
     };
 export interface FullOrder extends Omit<IOrder, "couponCode" | "products"> {
     couponCode?: ICoupon;
     products: FullOrderProduct[];
+    payment?: IPayment;
 }
 export default IOrder;

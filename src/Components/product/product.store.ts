@@ -1,10 +1,9 @@
-import type { PipelineStage } from "mongoose";
-
 import type { Images } from "@/services/cloudinary/request.js";
 import {
     errorHandler,
     paginateData,
-    searchFields,
+    pipelines,
+    searchAggretion,
     type Pagination,
 } from "@/shared/index.js";
 import {
@@ -18,33 +17,17 @@ class ProductStore {
     getProducts = (query: string, pagination?: Required<Pagination>) =>
         paginateData<IProduct>(
             () => this.searchData(query) as any,
-            "coupon",
+            "products",
             pagination
         );
 
     private searchData = (query: string) => {
-        const userFields = [
-            "title",
-            "productCategory.title",
-            "attrs.title",
-            "attrs.description",
-        ];
-        const pipeline: PipelineStage[] = [
-            {
-                $lookup: {
-                    from: "productcategories",
-                    localField: "productCategory",
-                    foreignField: "_id",
-                    as: "productCategory",
-                },
-            },
-            { $unwind: "$productCategory" },
-        ];
-        const orConditions = searchFields(userFields, query);
-        if (orConditions.length > 0 && query.trim() !== "") {
-            pipeline.push({ $match: { $or: orConditions } });
-        }
-
+        const productFields = pipelines.product.searchFields;
+        const pipeline = searchAggretion(
+            pipelines.product.pipeline,
+            productFields,
+            query
+        );
         return productModel.aggregate(pipeline);
     };
 

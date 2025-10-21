@@ -6,7 +6,12 @@ import type {
     IQuery,
     PaginationWithStatus,
 } from "@/shared/index.js";
-import { errorHandler, paginateData, searchFields } from "@/shared/index.js";
+import {
+    errorHandler,
+    paginateData,
+    pipelines,
+    searchAggretion,
+} from "@/shared/index.js";
 import {
     couponModel,
     couponStatus,
@@ -32,36 +37,19 @@ class CouponStore {
         pagination,
         ...params
     }: PaginationWithStatus & GetterFnParams) =>
-        paginateData<ICoupon>(this.getDataFn(params), "coupon", pagination);
+        paginateData<ICoupon>(this.getDataFn(params), "coupons", pagination);
 
     private searchData = (
         query: string,
         extraSearch?: PipelineStage[] | undefined
     ) => {
-        const userFields = [
-            "code",
-            "user.firstName",
-            "user.lastName",
-            "user.email",
-            "user.mobile",
-        ];
-        const pipeline: PipelineStage[] = [
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "user",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            { $unwind: "$user" },
-        ];
-        const orConditions = searchFields(userFields, query);
-        if (orConditions.length > 0 && query.trim() !== "") {
-            pipeline.push({ $match: { $or: orConditions } });
-        }
-
-        if (extraSearch) pipeline.push(...extraSearch);
+        const couponFields = ["code", ...pipelines.user.searchFields];
+        const pipeline = searchAggretion(
+            pipelines.user.pipeline,
+            couponFields,
+            query,
+            extraSearch
+        );
         return couponModel.aggregate(pipeline);
     };
 

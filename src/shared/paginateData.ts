@@ -10,7 +10,7 @@ export default <T>(
     pagination?: Required<Pagination>
 ) =>
     errorHandler(async (): Promise<GetDataWithPagination<T>> => {
-        const totalDocs = (await getDataFn().exec()).length;
+        const totalDocs = (await getDataFn()).length;
         if (!pagination)
             return {
                 currentPage: 1,
@@ -28,4 +28,4 @@ export default <T>(
             .limit(perPage)) as unknown as T[];
 
         return { currentPage, perPage, pages, data };
-    }, `getting ${dataName}s`);
+    }, `getting ${dataName}`);
