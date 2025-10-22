@@ -81,9 +81,11 @@ const getPaymentInfo = async (session: Stripe.Checkout.Session) => {
     };
 
     const paymentId = paymentIntent.id;
+    const currency = paymentIntent.currency;
+    console.log("🚀 ~ getPaymentInfo ~ currency:", currency);
     const paidAmount = paymentIntent.amount_received / 100;
 
-    return { paymentId, paidAmount };
+    return { paymentId, paidAmount, currency };
 };
 export default {
     createPaymentSession,

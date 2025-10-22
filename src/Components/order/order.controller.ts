@@ -1,4 +1,5 @@
 import type { Request, RequestHandler, Response } from "express";
+import type { ObjectId } from "mongoose";
 
 import { validate, validateAsync } from "@/middlewares/index.js";
 import { CouponValidator } from "@/services/index.js";
@@ -10,10 +11,8 @@ import {
     type Status,
 } from "@/shared/index.js";
 import couponStore from "@Coupon/coupon.store.js";
-import productStore from "@Product/product.store.js";
-import type IProduct from "@Product/schema/product.d.js";
+import { productStore, type IProduct } from "@Product/index.js";
 import userStore from "@User/user.store.js";
-import type { ObjectId } from "mongoose";
 import {
     editOrderStatusSchema,
     ordersStatus,

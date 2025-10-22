@@ -1,11 +1,12 @@
 import { Schema } from "mongoose";
 
 import { reference, statusSchema } from "@/shared/index.js";
-import ordersStore from "@Order/order.store.js";
+import { orderStore } from "@Order/index.js";
 import paymentStatus from "../payment.status.js";
 import type IPayment from "./payment.d.js";
+import { type FullPayment } from "./payment.d.js";
 
-export { type IPayment };
+export { type FullPayment, type IPayment };
 const paymentSchema = new Schema<IPayment>(
     {
         amount: { type: Number, required: true },
@@ -20,7 +21,7 @@ const paymentSchema = new Schema<IPayment>(
     { timestamps: true }
 );
 paymentSchema.pre("validate", async function () {
-    const { data: order, error } = await ordersStore.getOrder(
+    const { data: order, error } = await orderStore.getOrder(
         this.order as unknown as string
     );
     if (error || !order) throw error;

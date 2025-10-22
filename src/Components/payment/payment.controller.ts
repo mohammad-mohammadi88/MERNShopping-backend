@@ -16,6 +16,7 @@ import {
     orderStore,
 } from "@Order/index.js";
 import {
+    type FullPayment,
     type IPayment,
     type NewPaymentData,
     type UpdatePaymentData,
@@ -89,7 +90,7 @@ export const createSessionHandler: RequestHandler<
 const handleSuccess = async (event: Stripe.Event) => {
     const session = event.data.object as Stripe.Checkout.Session;
     const orderId = session.client_reference_id!;
-    if (orderId.length !== 24) return;
+    if (orderId?.length !== 24) return;
 
     const paymentInfo = await paymentStripe.getPaymentInfo(session);
     // @ts-ignore
@@ -100,24 +101,24 @@ const handleSuccess = async (event: Stripe.Event) => {
     await orderStore.editOrderStatus(orderId, ordersStatus.PAID);
     await paymentStore.updatePayment(orderId, updatePaymentInfo);
 };
-const handleFail = (orderId: string) =>
-    paymentStore.updatePayment(orderId, { status: paymentStatus.FAILED });
+const handleFail = async (orderId: string) =>
+    orderId &&
+    (await paymentStore.updatePayment(orderId, {
+        status: paymentStatus.FAILED,
+    }));
 
 const updatePaymentStatusCTRL: RequestHandler = async (req, res) => {
     const { data: event, ok } = paymentStripe.webhook(req);
 
     if (!ok) return res.status(500).send(event);
-    switch (event.type) {
-        case "checkout.session.completed":
-        case "payment_intent.succeeded":
-            await handleSuccess(event);
-        case "payment_intent.canceled":
-        case "payment_intent.payment_failed":
-            // @ts-ignore
-            await handleFail(event.data.object?.client_reference_id);
-        default:
-            break;
-    }
+    console.log("event.type: ", event.type);
+    if (event.type === "checkout.session.completed") await handleSuccess(event);
+    else if (
+        event.type === "payment_intent.canceled" ||
+        event.type === "payment_intent.payment_failed"
+    )
+        // @ts-ignore
+        await handleFail(event.data.object?.client_reference_id);
 
     res.sendStatus(200);
 };
@@ -143,4 +144,15 @@ export const getAllPaymentsHandler: RequestHandler<
         pagination,
     });
     return res.status(status).send(data || error);
+};
+
+// get single payment
+export const getSinglePaymentHandler: RequestHandler<
+    { id: string },
+    string | FullPayment
+> = async (req, res) => {
+    const { status, data, error } = await paymentStore.getSinglePayment(
+        req.params.id
+    );
+    return res.status(status).send(error || data);
 };
