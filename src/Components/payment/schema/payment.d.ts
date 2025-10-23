@@ -1,6 +1,5 @@
 import type { Document, Types } from "mongoose";
 
-import type { IOrder } from "@Order/index.ts";
 import type { IUser } from "@User/index.ts";
 import type { PaymentStatusValue } from "../payment.status.ts";
 
@@ -16,7 +15,6 @@ export default interface IPayment extends Document {
     createdAt: Date;
 }
 
-export interface FullPayment extends Omit<IPayment, "order" | "user"> {
+export interface FullPayment extends Omit<IPayment, "user"> {
     user: IUser;
-    order: IOrder;
 }

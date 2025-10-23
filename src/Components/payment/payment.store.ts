@@ -69,10 +69,7 @@ class PaymentStore {
             () =>
                 paymentModel
                     .findById(id)
-                    .populate([
-                        "order",
-                        "user",
-                    ]) as unknown as Promise<FullPayment>,
+                    .populate(["user"]) as unknown as Promise<FullPayment>,
             "getting payment",
             {
                 notFoundError: `payment with id ${id} doesn't exists`,

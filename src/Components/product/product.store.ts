@@ -37,9 +37,13 @@ class ProductStore {
         });
 
     getProductById = (id: string) =>
-        errorHandler(() => productModel.findById(id), "getting product by id", {
-            notFoundError: `Product with id #${id} not found`,
-        });
+        errorHandler(
+            () => productModel.findById(id).populate(["productCategory"]),
+            "getting product by id",
+            {
+                notFoundError: `Product with id #${id} not found`,
+            }
+        );
 
     changeProductQuantity = (_id: string, quantityEffect: number) => {
         const action = quantityEffect > 0 ? "increas" : "decreas";
