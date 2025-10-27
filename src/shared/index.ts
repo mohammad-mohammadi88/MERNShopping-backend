@@ -1,4 +1,5 @@
 export { default as capitalize } from "./capitalize.js";
+export * from "./collections.js";
 export { default as defaults } from "./defaults.js";
 export * from "./errorHandler.js";
 export { default as errorHandler } from "./errorHandler.js";

@@ -91,6 +91,13 @@ class OrderStore {
             { notFoundError: `Order with id #${id} doesn't exists` }
         );
 
+    editOrderData = (id: string, data: Partial<IOrder>) =>
+        errorHandler(
+            () => orderModel.findByIdAndUpdate(id, data),
+            "editing order data",
+            { notFoundError: `Order with id #${id} doesn't exists` }
+        );
+
     addPaymentId = (id: string, payment: string) =>
         errorHandler(
             () => orderModel.findByIdAndUpdate(id, { payment }),

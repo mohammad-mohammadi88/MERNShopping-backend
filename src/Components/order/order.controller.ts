@@ -16,9 +16,9 @@ import userStore from "@User/user.store.js";
 import {
     editOrderStatusSchema,
     ordersStatus,
+    OrderStatusValidator,
     orderStore,
     postOrderSchema,
-    StatusValidator,
     type EditOrderStatusSchema,
     type FullOrder,
     type IOrder,
@@ -206,7 +206,7 @@ const editOrderStatusCTRL: RequestHandler<
     if (!prevOrder) return;
 
     try {
-        const validator = new StatusValidator();
+        const validator = new OrderStatusValidator();
         validator.handler(status as any, prevOrder.status);
     } catch (e) {
         const error = (e as Error).message;

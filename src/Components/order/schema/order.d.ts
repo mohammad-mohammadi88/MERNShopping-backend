@@ -2,6 +2,7 @@ import type { Document, Types } from "mongoose";
 
 import type { ICoupon } from "@Coupon/index.js";
 import type { IPayment } from "@Payment/index.js";
+import type { IUser } from "@User/index.ts";
 import type {
     FullOrderProduct,
     IOrderProduct,
@@ -14,14 +15,17 @@ type IOrder = Omit<PostOrderSchema, "products"> &
         totalPrice: number;
         products: IOrderProduct[];
         user: Types.ObjectId;
+        shipment?: Types.ObjectId;
         finalPrice: number;
         createdAt: Date;
         updatedAt: Date;
         payment?: Types.ObjectId;
         status: OrderStatusValue;
     };
-export interface FullOrder extends Omit<IOrder, "couponCode" | "products"> {
+export interface FullOrder
+    extends Omit<IOrder, "couponCode" | "products" | "user"> {
     couponCode?: ICoupon;
+    user: IUser;
     products: FullOrderProduct[];
     payment?: IPayment;
 }

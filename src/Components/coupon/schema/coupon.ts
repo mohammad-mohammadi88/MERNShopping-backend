@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-import { errorHandler, reference, statusSchema } from "@/shared/index.js";
+import { errorHandler, reference, statusSchema } from "@Shared";
 import couponStatus from "../coupon.status.js";
 import type ICoupon from "./coupon.d.js";
 
@@ -13,13 +13,11 @@ const DiscountSchema = new Schema(
             required: true,
             validate: {
                 validator: function (this: { role: string; amount: number }) {
-                    if (this.role === "percent") {
-                        return this.amount >= 0 && this.amount <= 100;
-                    }
-                    if (this.role === "number") {
-                        return this.amount >= 0;
-                    }
-                    return false;
+                    return this.role === "percent"
+                        ? this.amount >= 0 && this.amount <= 100
+                        : this.role === "number"
+                        ? this.amount >= 0
+                        : false;
                 },
                 message: ({ value }: { value: number }) =>
                     `Invalid discount amount: ${value}. For "percent" must be 0–100, for "number" must be ≥ 0.`,

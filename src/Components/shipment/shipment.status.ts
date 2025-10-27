@@ -1,4 +1,4 @@
-const shipmentStatus = {
+export const shipmentStatus = {
     PENDING: 0,
     SHIPPING: 1,
     DELIVERED: 2,

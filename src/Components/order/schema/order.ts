@@ -1,6 +1,6 @@
 import { Schema } from "mongoose";
 
-import { reference, statusSchema } from "@/shared/index.js";
+import { reference, statusSchema } from "@Shared";
 import { userAddressSchema, userModel } from "@User/index.js";
 import ordersStatus from "../order.status.js";
 import { orderProductSchema, type IOrder } from "./index.js";
@@ -12,6 +12,7 @@ const orderSchema: Schema<IOrder> = new Schema(
         couponCode: { type: String, required: false },
         user: reference("User"),
         payment: reference("Payment", false),
+        shipment: reference("Shipment", false),
         products: {
             type: [orderProductSchema],
             required: true,

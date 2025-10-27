@@ -1,6 +1,5 @@
-import { capitalize, statusToString } from "@/shared/index.js";
-import type { OrderStatusValue } from "@Order/order.status.js";
-import ordersStatus from "@Order/order.status.js";
+import ordersStatus, { type OrderStatusValue } from "@Order/order.status.js";
+import { capitalize, statusToString } from "@Shared";
 import AbstractStatusHandler from "../AbstractStatusHandler.js";
 
 // ended statuses are "RECEIVED" and "CANCELED"

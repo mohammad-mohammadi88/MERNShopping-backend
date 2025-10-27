@@ -1,5 +1,4 @@
-import type { OrderStatusValue } from "@Order/order.status.js";
-import ordersStatus from "@Order/order.status.js";
+import ordersStatus, { type OrderStatusValue } from "@Order/order.status.js";
 import AbstractStatusHandler from "../AbstractStatusHandler.js";
 
 export default class OtherToInit extends AbstractStatusHandler {

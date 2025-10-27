@@ -1,8 +1,11 @@
-import type { OrderStatusValue } from "@Order/order.status.js";
+import type { ShipmentStatusValue } from "@Shipment/shipment.status.js";
 import AbstractStatusHandler from "../AbstractStatusHandler.js";
 
 export default class SameStatus extends AbstractStatusHandler {
-    public process(newStatus: OrderStatusValue, oldStatus: OrderStatusValue) {
+    public process(
+        newStatus: ShipmentStatusValue,
+        oldStatus: ShipmentStatusValue
+    ) {
         if (newStatus !== oldStatus)
             return super["process"](newStatus, oldStatus);
 

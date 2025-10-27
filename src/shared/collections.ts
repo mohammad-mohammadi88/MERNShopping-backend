@@ -1,4 +1,4 @@
-const collections = {
+export const collections = {
     comment: "Comment",
     coupon: "Coupon",
     order: "Order",
