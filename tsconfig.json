@@ -5,12 +5,8 @@
         "module": "nodenext",
         "moduleResolution": "nodenext",
         "target": "es2024",
-        "lib": [
-            "esnext"
-        ],
-        "types": [
-            "node"
-        ],
+        "lib": ["esnext"],
+        "types": ["node"],
         "verbatimModuleSyntax": true,
         "resolveJsonModule": true,
         "removeComments": true,
@@ -21,18 +17,18 @@
         "typeRoots": ["./node_modules/@types"],
 
         "paths": {
-            "@/*": [ "*" ],
-            "@P_Category/*": [ "Components/productCategory/*" ],
-            "@P_Offer/*": [ "Components/productOffer/*" ],
-            "@Product/*": [ "Components/product/*" ],
-            "@Payment/*": [ "Components/payment/*" ],
-            "@Coupon/*": [ "Components/coupon/*","services/coupon/*" ],
-            "@Order/*": [ "Components/order/*" ],
-            "@User/*": [ "Components/user/*" ]
+            "@/*": ["*"],
+            "@P_Category/*": ["Components/productCategory/*"],
+            "@P_Offer/*": ["Components/productOffer/*"],
+            "@Product/*": ["Components/product/*"],
+            "@Payment/*": ["Components/payment/*"],
+            "@Coupon/*": ["Components/coupon/*", "services/coupon/*"],
+            "@Order/*": ["Components/order/*"],
+            "@User/*": ["Components/user/*"],
+            "@Middlewares": ["middlewares/index.ts"],
+            "@Shared": ["shared/index.ts"]
         }
     },
-    "include": [
-        "src"
-, "worker/image.worker.cjs"    ],
+    "include": ["src", "worker/image.worker.cjs"],
     "exclude": ["node_modules"]
 }

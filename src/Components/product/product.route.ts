@@ -1,5 +1,6 @@
 import express from "express";
 
+import { authAdmin } from "@Middlewares";
 import {
     deleteProductByIdHandler,
     editProductByIdHandler,
@@ -10,9 +11,11 @@ import {
 
 const router = express.Router();
 
-router.post("/", postProductHandler);
 router.get("/", getAllProductsHandler);
 router.get("/:id", getProductByIdHandler);
+
+router.use(authAdmin);
+router.post("/", postProductHandler);
 router.put("/:id", editProductByIdHandler);
 router.delete("/:id", deleteProductByIdHandler);
 

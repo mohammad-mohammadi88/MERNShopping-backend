@@ -154,5 +154,10 @@ export const getSinglePaymentHandler: RequestHandler<
     const { status, data, error } = await paymentStore.getSinglePayment(
         req.params.id
     );
-    return res.status(status).send(error || data);
+    if (error || !data) return res.status(status).send(error);
+
+    if (!req.user.isAdmin && data.user.toString() !== req.user.id)
+        return res.status(401).send("You cannot access others payment info");
+
+    return res.status(200).send(data);
 };

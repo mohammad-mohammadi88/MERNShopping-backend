@@ -7,6 +7,7 @@ export default {
     couponCodeLength: 16,
     port: Number(process.env.PORT!),
     databaseUrl: process.env.DATABASE_URL!,
+    jwtPrivate: process.env.JWT_PRIVATE!,
     redis: {
         password: process.env.REDIS_PASSWORD!,
         host: process.env.REDIS_HOST!,

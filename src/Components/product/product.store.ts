@@ -1,4 +1,4 @@
-import type { Images } from "@/services/cloudinary/request.js";
+import type { Images } from "@/request.js";
 import {
     errorHandler,
     paginateData,

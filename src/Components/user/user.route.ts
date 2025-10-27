@@ -1,32 +1,33 @@
 import express from "express";
 
-import { getUsersHandler } from "./user.controller.js";
-import userModel from "./user.model.js";
+import { auth, authAdmin, userIdAccess } from "@Middlewares";
+import {
+    deleteUserHandler,
+    getUserHandler,
+    getUsersHandler,
+    loginHandler,
+    registerHandler,
+    updateUserHandler,
+} from "./user.controller.js";
 
 const router = express.Router();
 
+router.post("/login", loginHandler);
+router.post("/register", registerHandler);
 router.get("/", getUsersHandler);
-router.post("/", async (req, res) => {
-    const mobile = "09146360528";
-    const firstName = "mohammad";
-    const lastName = "mohammadi";
-    const newUser = new userModel({
-        firstName,
-        lastName,
-        email: "mohammaddev09@gmail.com",
-        mobile,
-    });
-    newUser.addresses.push({
-        title: "urmia",
-        state: "urmia",
-        city: "urmia",
-        mobile,
-        address: "iran urmia",
-        zipCode: "142415611",
-    });
-    await newUser.save();
 
-    res.json({ newUser });
-});
+router.use(auth);
+
+// to get yourself info
+router.get("/self", getUserHandler());
+
+// to get every ones info which is just available for admins
+router.get("/:id", authAdmin, (...request) =>
+    getUserHandler(request[0].params.id)(...request)
+);
+
+router.use("/:id", userIdAccess());
+router.delete("/:id", deleteUserHandler);
+router.patch("/:id", updateUserHandler);
 
 export default router;

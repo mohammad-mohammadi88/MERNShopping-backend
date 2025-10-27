@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { couponCodeSchema, userSchema } from "@/shared/schema.js";
+import { couponCodeSchema } from "@/shared/schema.js";
 import { productColorSchema } from "@Product/product.validate.js";
 import { userAddressSchema } from "@User/user.validate.js";
 import productsStatus from "../product/product.status.js";
@@ -64,7 +64,6 @@ export type OrderProductSchema = z.infer<typeof orderProductSchema>;
 export const postOrderSchema = z.object({
     products: z.array(orderProductSchema),
     couponCode: couponCodeSchema,
-    user: userSchema,
     deliveryAddress: userAddressSchema.optional(),
 });
 export type PostOrderSchema = z.infer<typeof postOrderSchema>;

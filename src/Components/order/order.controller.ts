@@ -1,17 +1,17 @@
 import type { Request, RequestHandler, Response } from "express";
 import type { ObjectId } from "mongoose";
 
-import { validate, validateAsync } from "@/middlewares/index.js";
 import { CouponValidator } from "@/services/index.js";
+import couponStore from "@Coupon/coupon.store.js";
+import { validate, validateAsync } from "@Middlewares";
+import { productStore, type IProduct } from "@Product/index.js";
 import {
     paginationHandler,
     type GetDataWithPagination,
     type IQuery,
     type Pagination,
     type Status,
-} from "@/shared/index.js";
-import couponStore from "@Coupon/coupon.store.js";
-import { productStore, type IProduct } from "@Product/index.js";
+} from "@Shared";
 import userStore from "@User/user.store.js";
 import {
     editOrderStatusSchema,
@@ -35,7 +35,7 @@ const handleCounpon = async (
     req: Request<null, string | IOrder, PostOrderSchema>,
     res: Response
 ) => {
-    const { couponCode, user } = req.body;
+    const { couponCode } = req.body;
     const {
         status: couponStatus,
         data: coupon,
@@ -47,7 +47,7 @@ const handleCounpon = async (
 
     try {
         const validator = new CouponValidator();
-        await validator.handler(user, coupon);
+        await validator.handler(req.user.id, coupon);
     } catch (e: unknown) {
         const error = (e as Error).message;
         throw res.status(400).send(error);
@@ -87,7 +87,7 @@ const postNewOrderCTRL: RequestHandler<
 
     // increase user totalOrders
     const { status: userStatus, error: userError } =
-        await userStore.changeTotalOrdersCount(req.body.user);
+        await userStore.changeTotalOrdersCount(req.user.id);
     if (userError) return res.status(userStatus).send(userError);
 
     interface FullInfoProducts extends Pick<IOrderProduct, "count" | "color"> {
@@ -171,7 +171,12 @@ export const getOrderByIdHandler: RequestHandler<
     string | FullOrder
 > = async (req, res) => {
     const { status, data, error } = await orderStore.getOrder(req.params.id);
-    return res.status(status).send(data || error);
+    if (error || !data) return res.status(status).send(error);
+
+    if (!req.user.isAdmin && data.user.toString() !== req.user.id)
+        return res.status(401).send("You cannot access others order");
+
+    return res.status(200).send(data);
 };
 
 // get orders count

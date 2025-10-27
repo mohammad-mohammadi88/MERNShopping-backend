@@ -1,5 +1,6 @@
 import express from "express";
 
+import { authAdmin } from "@Middlewares";
 import {
     getCategoriesHandler,
     getCategoryByIdHandler,
@@ -8,8 +9,10 @@ import {
 
 const router = express.Router();
 
-router.post("/", postCategoryHandler);
 router.get("/", getCategoriesHandler);
 router.get("/:id", getCategoryByIdHandler);
+
+router.use(authAdmin);
+router.post("/", postCategoryHandler);
 
 export default router;

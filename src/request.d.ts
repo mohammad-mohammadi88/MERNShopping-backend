@@ -5,9 +5,17 @@ export interface Images {
     thumbnail: string;
     gallery: string[];
 }
+export interface AuthUser {
+    id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    isAdmin: boolean;
+    mobile: string;
+}
 declare module "express-serve-static-core" {
     interface Request {
-        // user: User;
+        user: AuthUser;
         images: Images;
         prevProduct?: IProduct;
         newGalleryImages: string[];

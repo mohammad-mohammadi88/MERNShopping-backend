@@ -11,7 +11,8 @@ const userSchema: Schema<IUser> = new Schema(
         mobile: { type: String, required: true, unique: true },
         addresses: { type: [userAddressSchema], default: [] },
         totalOrders: { type: Number, default: 0 },
-        wallet: { type: Number, default: 0 },
+        password: { type: String, require: true, select: false },
+        isAdmin: { type: Boolean, default: false },
     },
     { timestamps: true }
 );

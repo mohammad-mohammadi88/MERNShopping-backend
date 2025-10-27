@@ -1,10 +1,10 @@
-import appRouter from "@/Components/routes.js";
 import { v2 as cloudinary } from "cloudinary";
 import compression from "compression";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
 
+import appRouter from "@/Components/routes.js";
 import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
 import { defaults, mongooseConnection } from "./shared/index.js";
 

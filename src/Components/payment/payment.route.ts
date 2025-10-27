@@ -1,5 +1,6 @@
 import express from "express";
 
+import { auth, authAdmin } from "@Middlewares";
 import {
     createSessionHandler,
     getAllPaymentsHandler,
@@ -8,8 +9,11 @@ import {
 
 const router = express.Router();
 
+router.use(auth);
 router.post("/", createSessionHandler);
-router.get("/", getAllPaymentsHandler);
 router.get("/:id", getSinglePaymentHandler);
+
+router.use(authAdmin);
+router.get("/", getAllPaymentsHandler);
 
 export default router;
