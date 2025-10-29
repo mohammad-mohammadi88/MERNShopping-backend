@@ -1,4 +1,4 @@
-export default <T extends object>(status: T, defaultParam?: keyof T) => {
+const statusSchema = <T extends object>(status: T, defaultParam?: keyof T) => {
     const values = Object.values(status);
     return {
         type: Number,
@@ -6,3 +6,4 @@ export default <T extends object>(status: T, defaultParam?: keyof T) => {
         default: defaultParam ? (status[defaultParam] as number) : values[0],
     };
 };
+export default statusSchema;

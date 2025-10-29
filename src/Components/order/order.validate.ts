@@ -1,10 +1,12 @@
 import { z } from "zod";
 
-import { couponCodeSchema } from "@/shared/schema.js";
-import { productColorSchema } from "@Product/product.validate.js";
+import {
+    productColorSchemaZod,
+    productsStatus,
+    productStore,
+} from "@Product/index.js";
+import { couponCodeSchema } from "@Shared";
 import { userAddressSchema } from "@User/user.validate.js";
-import productsStatus from "../product/product.status.js";
-import productStore from "../product/product.store.js";
 import ordersStatus from "./order.status.js";
 
 // orderProductCheck
@@ -53,7 +55,7 @@ const orderProductCheck = async (values: OrderProductSchema): Promise<true> => {
 // order product
 export const orderProductSchema = z
     .object({
-        color: productColorSchema(z.number().nonnegative()).optional(),
+        color: productColorSchemaZod(z.number().nonnegative()).optional(),
         product: z.string().length(24),
         count: z.number().optional(),
     })

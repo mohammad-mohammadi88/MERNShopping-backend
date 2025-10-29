@@ -1,8 +1,10 @@
 import { model } from "mongoose";
 
-import collections from "@/shared/collections.js";
-import type IProductCategory from "./schema/productCategory.d.js";
-import productCategorySchema from "./schema/productCategory.js";
+import { collections } from "@Shared";
+import {
+    productCategorySchema,
+    type IProductCategory,
+} from "./schema/index.js";
 
 export default model<IProductCategory>(
     collections.productCategory,

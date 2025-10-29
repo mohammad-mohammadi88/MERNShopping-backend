@@ -4,7 +4,7 @@ const title = z.string();
 
 const categoryAttrGroupSchema = z.object({
     title,
-    attrs: z.array(z.string()),
+    attrs: z.array(title),
 });
 
 // post Category Schema

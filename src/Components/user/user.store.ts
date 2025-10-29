@@ -61,6 +61,9 @@ class UserStore {
             { notFoundError: `There is no use with id #${id}` }
         );
 
+    isUserExists = async (_id: string): Promise<boolean> =>
+        !!(await userModel.exists({ _id }))?._id;
+
     changeTotalOrdersCount = (_id: string, action: Action = "increas") =>
         errorHandler(
             () =>

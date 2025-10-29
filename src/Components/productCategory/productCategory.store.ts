@@ -4,10 +4,12 @@ import {
     paginateData,
     type Pagination,
     searchFields,
-} from "@/shared/index.js";
-import productCategoryModel from "./productCategory.model.js";
-import type { PostCategorySchema } from "./productCategory.validate.js";
-import type IProductCategory from "./schema/productCategory.d.js";
+} from "@Shared";
+import {
+    type IProductCategory,
+    type PostCategorySchema,
+    productCategoryModel,
+} from "./index.js";
 
 class ProductCategoryStore {
     addCategory = (body: PostCategorySchema) =>

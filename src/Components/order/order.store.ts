@@ -1,15 +1,15 @@
 import type { PipelineStage } from "mongoose";
 
+import { couponModel } from "@Coupon/index.js";
 import {
     errorHandler,
     paginateData,
     pipelines,
     searchAggretion,
     type GetDataFn,
-    type IQuery,
+    type GetterFnParams,
     type PaginationWithStatus,
-} from "@/shared/index.js";
-import { couponModel } from "@Coupon/index.js";
+} from "@Shared";
 import {
     orderModel,
     type FullOrder,
@@ -21,7 +21,6 @@ type PostOrderData = PostOrderSchema & {
     totalPrice: number;
     finalPrice: number;
 };
-type GetterFnParams = { status: number | undefined } & IQuery;
 
 class OrderStore {
     getAllOrders = ({

@@ -9,7 +9,6 @@ const password = z
             code: "custom",
             message,
         });
-
         interface Validation {
             message: string;
             regex: RegExp;

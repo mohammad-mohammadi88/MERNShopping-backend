@@ -1,12 +1,12 @@
 import type { RequestHandler } from "express";
 
-import validate from "@/middlewares/validate.js";
+import { validate } from "@Middlewares";
 import {
     paginationHandler,
     type GetDataWithPagination,
     type IQuery,
     type Pagination,
-} from "@/shared/index.js";
+} from "@Shared";
 import {
     postCategorySchema,
     productCategoryStore,

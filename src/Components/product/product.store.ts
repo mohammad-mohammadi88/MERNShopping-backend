@@ -5,7 +5,7 @@ import {
     pipelines,
     searchAggretion,
     type Pagination,
-} from "@/shared/index.js";
+} from "@Shared";
 import {
     productModel,
     type EditProductSchema,
@@ -74,6 +74,9 @@ class ProductStore {
             "deleting product",
             { notFoundError: `Product with id #${id} not found` }
         );
+
+    isProductExists = async (_id: string): Promise<boolean> =>
+        !!(await productModel.exists({ _id }))?._id;
 }
 
 export default new ProductStore();

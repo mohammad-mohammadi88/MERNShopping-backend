@@ -9,7 +9,6 @@ export default interface IComment extends Document {
     product: Types.ObjectId;
     title: string;
     body: string;
-    isCustomer: boolean;
     createdAt: Date;
     recommendation: CommentRecommendationValue;
     status: CommentStatusValue;

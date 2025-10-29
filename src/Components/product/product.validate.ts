@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import productCategoryStore from "@P_Category/productCategory.store.js";
+import { productCategoryStore } from "@P_Category/index.js";
 import productsStatus from "./product.status.js";
 
 // chech category funtionality
@@ -26,7 +26,7 @@ const attrSchema = z.object({
 });
 
 // product color schema
-export const productColorSchema = (
+export const productColorSchemaZod = (
     priceEffect: any = number(z.number().nonnegative().optional())
 ) =>
     z.object({
@@ -67,7 +67,7 @@ const productSchemaBase = {
     ),
     productCategory,
     attrs: array(z.array(attrSchema).optional()),
-    colors: array(z.array(productColorSchema()).optional()),
+    colors: array(z.array(productColorSchemaZod()).optional()),
 };
 
 // post product schema

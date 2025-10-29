@@ -24,6 +24,7 @@
             "@Payment/*": ["Components/payment/*"],
             "@Shipment/*": ["Components/shipment/*"],
             "@Coupon/*": ["Components/coupon/*", "services/coupon/*"],
+            "@Comment/*": ["Components/comment/*"],
             "@Order/*": ["Components/order/*"],
             "@User/*": ["Components/user/*"],
             "@Middlewares": ["middlewares/index.ts"],

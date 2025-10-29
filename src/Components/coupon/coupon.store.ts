@@ -1,17 +1,12 @@
 import type { PipelineStage } from "mongoose";
 
-import type {
-    Action,
-    GetDataFn,
-    IQuery,
-    PaginationWithStatus,
-} from "@/shared/index.js";
+import type { Action, GetDataFn, IQuery, PaginationWithStatus } from "@Shared";
 import {
     errorHandler,
     paginateData,
     pipelines,
     searchAggretion,
-} from "@/shared/index.js";
+} from "@Shared";
 import {
     couponModel,
     couponStatus,

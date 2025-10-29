@@ -1,4 +1,4 @@
-import type { OrderStatusValue } from "../../order.status.js";
+import type { OrderStatusValue } from "@Order/index.js";
 import type StatusHandler from "./StatusHandler.js";
 import type { OrderProcess } from "./StatusHandler.js";
 

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { auth, authAdmin } from "@Middlewares";
+import { authAdmin } from "@Middlewares";
 import {
     editOrderStatusHandler,
     getAllOrdersHandler,
@@ -11,7 +11,6 @@ import {
 
 const router = express.Router();
 
-router.use(auth);
 router.post("/", postNewOrderHandler);
 router.get("/:id", getOrderByIdHandler);
 

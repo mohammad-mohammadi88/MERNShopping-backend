@@ -1,7 +1,7 @@
-import { Schema } from "mongoose";
+import { Schema, type ObjectId } from "mongoose";
 
-import { reference, statusSchema } from "@/shared/index.js";
 import { orderStore } from "@Order/index.js";
+import { reference, statusSchema } from "@Shared";
 import paymentStatus from "../payment.status.js";
 import type IPayment from "./payment.d.js";
 import { type FullPayment } from "./payment.d.js";
@@ -27,7 +27,7 @@ paymentSchema.pre("validate", async function () {
     if (error || !order) throw error;
 
     this.amount = order.finalPrice;
-    this.user = order.user;
+    this.user = (order.user._id as ObjectId).toString() as any;
 });
 
 export default paymentSchema;

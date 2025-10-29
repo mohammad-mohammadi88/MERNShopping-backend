@@ -1,6 +1,7 @@
 import { Schema } from "mongoose";
 
-import { reference, statusSchema } from "@/shared/index.js";
+import statusSchema from "@/shared/statusSchema.js";
+import { reference } from "@Shared";
 import productStatus from "../product.status.js";
 import productAttrSchema from "./product.attr.js";
 import productColorSchema from "./product.color.js";

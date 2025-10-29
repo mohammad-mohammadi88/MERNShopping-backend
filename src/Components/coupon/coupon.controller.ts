@@ -1,14 +1,14 @@
 import type { RequestHandler } from "express";
 
-import validateAsync from "@/middlewares/validateAsync.js";
-import type {
-    GetDataWithPagination,
-    IQuery,
-    Pagination,
-    Status,
-} from "@/shared/index.js";
-import paginationHandler from "@/shared/paginationHandler.js";
 import couponCodeGenerator from "@Coupon/couponCodeGenerator.js";
+import { validateAsync } from "@Middlewares";
+import {
+    paginationHandler,
+    type GetDataWithPagination,
+    type IQuery,
+    type Pagination,
+    type Status,
+} from "@Shared";
 import {
     couponStore,
     postCouponSchema,

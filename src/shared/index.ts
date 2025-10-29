@@ -41,3 +41,4 @@ export interface PaginationWithStatus {
 export interface IQuery {
     query: string;
 }
+export type GetterFnParams = { status: number | undefined } & IQuery;

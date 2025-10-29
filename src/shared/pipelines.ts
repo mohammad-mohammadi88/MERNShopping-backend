@@ -4,26 +4,29 @@ interface CollectionPipeline {
     pipeline: PipelineStage[];
     searchFields: string[];
 }
-type PipelineNames = "user" | "orderProducts" | "product";
+type PipelineNames = "user" | "orderProducts" | "product" | "commentProduct";
+
+const userPipeline = [
+    {
+        $lookup: {
+            from: "users",
+            localField: "user",
+            foreignField: "_id",
+            as: "user",
+        },
+    },
+    { $unwind: "$user" },
+];
+const userSearchFields = [
+    "user.firstName",
+    "user.lastName",
+    "user.email",
+    "user.mobile",
+];
 const pipelines: Record<PipelineNames, CollectionPipeline> = {
     user: {
-        pipeline: [
-            {
-                $lookup: {
-                    from: "users",
-                    localField: "user",
-                    foreignField: "_id",
-                    as: "user",
-                },
-            },
-            { $unwind: "$user" },
-        ],
-        searchFields: [
-            "user.firstName",
-            "user.lastName",
-            "user.email",
-            "user.mobile",
-        ],
+        pipeline: userPipeline,
+        searchFields: userSearchFields,
     },
     orderProducts: {
         pipeline: [
@@ -63,9 +66,40 @@ const pipelines: Record<PipelineNames, CollectionPipeline> = {
         ],
         searchFields: [
             "title",
-            "productCategory.title",
             "attrs.title",
             "attrs.description",
+            "productCategory.title",
+        ],
+    },
+    commentProduct: {
+        pipeline: [
+            ...userPipeline,
+            {
+                $lookup: {
+                    from: "products",
+                    localField: "product",
+                    as: "product",
+                    foreignField: "_id",
+                },
+            },
+            { $unwind: "$product" },
+            {
+                $lookup: {
+                    from: "productcategories",
+                    localField: "product.productCategory",
+                    foreignField: "_id",
+                    as: "product.productCategory",
+                },
+            },
+            { $unwind: "$product.productCategory" },
+        ],
+        searchFields: [
+            ...userSearchFields,
+            "product.productCategory.title",
+            "product.productCategory.attrs.title",
+            "product.productCategory.attrs.description",
+            "title",
+            "body",
         ],
     },
 };

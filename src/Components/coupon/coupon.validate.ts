@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { userSchema } from "@/shared/schema.js";
+import { userSchema } from "@Shared";
 
 const discountSchema = z
     .object({

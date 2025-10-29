@@ -5,7 +5,7 @@ import { defaults } from "@Shared";
 
 const jwtPrivate = defaults.jwtPrivate;
 
-const expiresIn = "2d";
+const expiresIn = "20d";
 const generateToken = (payload: AuthUser) =>
     jwt.sign(payload, jwtPrivate, { expiresIn });
 

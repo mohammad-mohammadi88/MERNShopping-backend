@@ -1,6 +1,6 @@
 import express from "express";
 
-import { auth, authAdmin } from "@Middlewares";
+import { authAdmin } from "@Middlewares";
 import {
     createSessionHandler,
     getAllPaymentsHandler,
@@ -9,7 +9,6 @@ import {
 
 const router = express.Router();
 
-router.use(auth);
 router.post("/", createSessionHandler);
 router.get("/:id", getSinglePaymentHandler);
 

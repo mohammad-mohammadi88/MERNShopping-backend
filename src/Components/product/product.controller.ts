@@ -1,18 +1,14 @@
 import type { RequestHandler } from "express";
 import fileUpload from "express-fileupload";
 
-import {
-    imageDestroyer,
-    imageResize,
-    validateAsync,
-} from "@/middlewares/index.js";
+import { imageDestroyer, imageResize, validateAsync } from "@Middlewares";
+import { productCategoryStore } from "@P_Category/index.js";
 import {
     paginationHandler,
     type GetDataWithPagination,
     type IQuery,
     type Pagination,
-} from "@/shared/index.js";
-import productCategoryStore from "@P_Category/productCategory.store.js";
+} from "@Shared";
 import {
     editProductSchema,
     postProductSchema,

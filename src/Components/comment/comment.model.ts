@@ -1,6 +1,6 @@
 import { model } from "mongoose";
 
-import collections from "@/shared/collections.js";
+import { collections } from "@Shared";
 import type IComment from "./schema/comment.d.js";
 import commentSchema from "./schema/comment.js";
 

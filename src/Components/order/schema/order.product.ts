@@ -1,7 +1,7 @@
 import { Schema } from "mongoose";
 
-import reference from "@/shared/reference.js";
-import productColorSchema from "@Product/schema/product.color.js";
+import { productColorSchema } from "@Product/index.js";
+import { reference } from "@Shared";
 import type IOrderProduct from "./order.product.d.js";
 
 const orderProductSchema: Schema<IOrderProduct> = new Schema({

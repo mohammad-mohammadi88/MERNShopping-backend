@@ -8,7 +8,7 @@ import {
     type GetDataFn,
     type IQuery,
     type PaginationWithStatus,
-} from "@/shared/index.js";
+} from "@Shared";
 import {
     paymentModel,
     type FullPayment,
