@@ -12,10 +12,12 @@ import {
 const router = express.Router();
 
 router.post("/", postNewOrderHandler);
+
+router.get("/count", authAdmin, getOrdersCountHandler as any);
+
 router.get("/:id", getOrderByIdHandler);
 
 router.use(authAdmin);
-router.get("/count", getOrdersCountHandler);
 router.get("/", getAllOrdersHandler);
 router.patch("/:id", editOrderStatusHandler);
 

@@ -3,7 +3,8 @@ import { Schema } from "mongoose";
 import { reference, statusSchema } from "@Shared";
 import { userAddressSchema, userModel } from "@User/index.js";
 import ordersStatus from "../order.status.js";
-import { orderProductSchema, type IOrder } from "./index.js";
+import { type IOrder } from "./index.js";
+import orderProductSchema from "./order.product.js";
 
 const orderSchema: Schema<IOrder> = new Schema(
     {

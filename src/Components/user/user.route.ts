@@ -3,8 +3,8 @@ import express from "express";
 import { auth, authAdmin, userIdAccess } from "@Middlewares";
 import {
     deleteUserHandler,
+    getAllCustomersHandler,
     getUserHandler,
-    getUsersHandler,
     loginHandler,
     registerHandler,
     updateUserHandler,
@@ -14,10 +14,9 @@ const router = express.Router();
 
 router.post("/login", loginHandler);
 router.post("/register", registerHandler);
-router.get("/", getUsersHandler);
+router.get("/", getAllCustomersHandler);
 
 router.use(auth);
-
 // to get yourself info
 router.get("/self", getUserHandler());
 

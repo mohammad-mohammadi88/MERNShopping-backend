@@ -1,6 +1,6 @@
 import { model } from "mongoose";
 
-import collections from "@/shared/collections.js";
+import { collections } from "@Shared";
 import type IUser from "./schema/user.d.js";
 import userSchema from "./schema/user.js";
 

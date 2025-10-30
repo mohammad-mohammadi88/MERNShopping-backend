@@ -1,6 +1,12 @@
 import { jwtToken } from "@/services/index.js";
+import cookie from "cookie";
 
-import type { RequestHandler } from "express";
+import type { Request, RequestHandler } from "express";
+
+const getToken = (req: Request) =>
+    (req.headers.cookie && cookie.parse(req.headers.cookie)?.token) ||
+    // to set token in postman
+    req.headers.authorization?.slice(7);
 
 const validateToken = (token: string | undefined) => {
     try {
@@ -15,10 +21,7 @@ const validateToken = (token: string | undefined) => {
     }
 };
 export const auth: RequestHandler = async (req, res, next) => {
-    // to skip Bearer word
-    const token = req.headers.authorization?.slice(7);
-
-    const user = validateToken(token);
+    const user = validateToken(getToken(req));
     if (typeof user === "string") return res.status(400).send(user);
 
     req.user = user;
@@ -26,10 +29,7 @@ export const auth: RequestHandler = async (req, res, next) => {
 };
 
 export const authAdmin: RequestHandler = async (req, res, next) => {
-    // to skip Bearer word
-    const token = req.headers.authorization?.slice(7);
-
-    const user = validateToken(token);
+    const user = validateToken(getToken(req));
     if (typeof user === "string") return res.status(400).send(user);
 
     if (!user.isAdmin)

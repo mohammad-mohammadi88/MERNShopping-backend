@@ -6,7 +6,7 @@ import helmet from "helmet";
 
 import appRouter from "@/Components/routes.js";
 import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
-import { defaults, mongooseConnection } from "./shared/index.js";
+import { defaults, mongooseConnection } from "@Shared";
 
 const app = express();
 
@@ -14,15 +14,33 @@ const app = express();
     // connect mongo
     await mongooseConnection.connect();
 
-    // config cloudinary
-    cloudinary.config(defaults.cloudinary);
-
     // stripe webhook
     app.post("/payments/webhookSessionCheck", updatePaymentStatusHandler);
 
+    // config cloudinary
+    cloudinary.config(defaults.cloudinary);
+
     // middleware
     app.use(helmet());
-    app.use(cors());
+    app.use(
+        cors({
+            credentials: true,
+            origin(requestOrigin, callback) {
+                // allow for development
+                if (defaults.platform === "development")
+                    return callback(null, true);
+
+                const allowedOrigins = Object.values(defaults.frontend.domains);
+
+                const isOriginAllowed =
+                    requestOrigin && allowedOrigins.includes(requestOrigin);
+                const originError = new Error("Not allowed CORS");
+
+                if (isOriginAllowed) callback(null, true);
+                else callback(originError);
+            },
+        })
+    );
     app.use(compression());
     app.use(express.json());
 

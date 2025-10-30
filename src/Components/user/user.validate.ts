@@ -46,7 +46,10 @@ export const userAddressSchema = z
         address: z.string(),
         state: z.string(),
         city: z.string(),
-        mobile: z.string().min(11),
+        mobile: z
+            .string()
+            .min(11, "mobile is not valid")
+            .max(15, "mobile is not valid"),
         zipCode: z.string().optional(),
     })
     .strip();

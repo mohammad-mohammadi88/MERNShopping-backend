@@ -13,17 +13,17 @@ import {
 import {
     loginSchema,
     registerSchema,
+    userCookie,
     userStore,
     userUpdateSchema,
-    type FormatedUser,
     type IUser,
     type LoginSchema,
     type RegisterSchema,
     type UserUpdateSchema,
 } from "./index.js";
 
-// get all users
-const getUsersCTRL: RequestHandler<
+// get all Customers
+const getAllCustomersCTRL: RequestHandler<
     null,
     string | GetDataWithPagination<IUser>,
     null,
@@ -32,17 +32,18 @@ const getUsersCTRL: RequestHandler<
     const pagination = paginationHandler(req);
     const query = req.query.query || "";
 
-    const { status, data, error } = await userStore.getAllUsers(
+    const { status, data, error } = await userStore.getAllCustomers(
         query,
         pagination
     );
     return res.status(status).send(data || error);
 };
-export const getUsersHandler: any[] = [authAdmin, getUsersCTRL];
+export const getAllCustomersHandler: any[] = [authAdmin, getAllCustomersCTRL];
 
 // get user
-export const getUserHandler: (id?: string) => RequestHandler =
-    (id) => async (req, res) => {
+export const getUserHandler =
+    (id?: string): RequestHandler =>
+    async (req, res) => {
         const { status, data, error } = await userStore.getUserById(
             id || req.user.id
         );
@@ -50,14 +51,14 @@ export const getUserHandler: (id?: string) => RequestHandler =
     };
 
 // delete user
-export const deleteUserHandler: RequestHandler<
-    { id: string },
-    string | FormatedUser
-> = async (req, res) => {
+export const deleteUserHandler: RequestHandler<{ id: string }, string> = async (
+    req,
+    res
+) => {
     const id = req.params.id;
 
-    const { status, data, error } = await userStore.deleteUser(id);
-    return res.status(status).send(data || error);
+    const { status, error } = await userStore.deleteUser(id);
+    return res.status(status).send(error || "User deleted successfully");
 };
 
 // update user
@@ -67,6 +68,18 @@ const updateUserCTRL: RequestHandler<
     UserUpdateSchema
 > = async (req, res) => {
     const id = req.params.id;
+
+    // to get user info
+    const {
+        status: userStatus,
+        data: user,
+        error: userError,
+    } = await userStore.getUserById(id, true);
+    if (userError || !user) return res.status(userStatus).send(userError);
+
+    if (req.user.id !== id && user.isAdmin)
+        return res.status(403).send("You cannot update another admins info");
+
     const { auth, isAdmin: requestIsAdmin, ...info } = req.body;
     let updateUserFields: UpdateQuery<IUser> = info;
 
@@ -75,21 +88,16 @@ const updateUserCTRL: RequestHandler<
             email,
             password: { next, prev },
         } = auth;
-        // to get user info
-        const {
-            status: userStatus,
-            data: user,
-            error: userError,
-        } = await userStore.getUserById(id, true);
-        if (userError || !user) return res.status(userStatus).send(userError);
 
-        // to check prev password
-        const isPasswordCorrect = await cryptoPassword.comparePassword(
-            prev,
-            user.password
-        );
-        if (!isPasswordCorrect)
-            return res.status(400).send("Password is wrong");
+        if (!req.user.isAdmin) {
+            // to check prev password
+            const isPasswordCorrect = await cryptoPassword.comparePassword(
+                prev,
+                user.password
+            );
+            if (!isPasswordCorrect)
+                return res.status(400).send("Password is wrong");
+        }
 
         // update with new password
         updateUserFields.email = email;
@@ -106,17 +114,20 @@ const updateUserCTRL: RequestHandler<
     );
     if (error || !data) return res.status(status).send(error);
 
-    const { email, firstName, lastName, mobile, isAdmin } = data;
-    const tokenData: AuthUser = {
-        id,
-        email,
-        firstName,
-        lastName,
-        mobile,
-        isAdmin,
-    };
-    const token = jwtToken.generateToken(tokenData);
-    return res.status(status).send(token);
+    if (req.user.id === id) {
+        const { email, firstName, lastName, mobile, isAdmin } = data;
+        const tokenData: AuthUser = {
+            id,
+            email,
+            firstName,
+            lastName,
+            mobile,
+            isAdmin,
+        };
+        const token = jwtToken.generateToken(tokenData);
+        res.setHeader("Set-Cookie", userCookie.serialize(token));
+    }
+    return res.status(200).send("ok");
 };
 export const updateUserHandler: any[] = [
     validate(userUpdateSchema),
@@ -148,7 +159,8 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
         isAdmin,
     };
     const token = jwtToken.generateToken(tokenData);
-    return res.status(200).send(token);
+    res.setHeader("Set-Cookie", userCookie.serialize(token));
+    return res.status(200).send("ok");
 };
 export const loginHandler: any[] = [validate(loginSchema), loginCTRL];
 
@@ -189,6 +201,7 @@ const registerCTRL: RequestHandler<null, string, RegisterSchema> = async (
         isAdmin: false,
     };
     const token = jwtToken.generateToken(tokenData);
-    return res.status(201).send(token);
+    res.setHeader("Set-Cookie", userCookie.serialize(token));
+    return res.status(201).send("ok");
 };
 export const registerHandler: any[] = [validate(registerSchema), registerCTRL];

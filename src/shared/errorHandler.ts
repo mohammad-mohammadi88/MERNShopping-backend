@@ -23,7 +23,7 @@ export default async <T>(
 ): Promise<Result<T>> => {
     try {
         const result = await fn();
-        if (!result) {
+        if (result === undefined || result === null) {
             return {
                 error: notFoundError,
                 status: 404,

@@ -1,10 +1,15 @@
 import "dotenv/config";
-const frontendDomain = process.env.FRONTEND_DOMAIN!;
+const mainSiteDomain = process.env.MAIN_SITE_DOMAIN!;
+const adminSiteDomain = process.env.ADMIN_SITE_DOMAIN!;
+
+type Platform = "development" | "production";
+const platform = process.env.NODE_ENV! as Platform;
 
 export default {
     cloudinaryFolder: "mernShopping",
     maxGalleryLength: 3,
     couponCodeLength: 16,
+    platform,
     port: Number(process.env.PORT!),
     databaseUrl: process.env.DATABASE_URL!,
     jwtPrivate: process.env.JWT_PRIVATE!,
@@ -23,8 +28,11 @@ export default {
         stripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET!,
     },
     frontend: {
-        domain: frontendDomain,
-        success_url: `${frontendDomain}/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${frontendDomain}/cancel`,
+        domains: {
+            mainSiteDomain,
+            adminSiteDomain,
+        },
+        success_url: `${mainSiteDomain}/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${mainSiteDomain}/cancel`,
     },
 };

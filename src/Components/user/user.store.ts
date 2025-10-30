@@ -1,3 +1,5 @@
+import type { UpdateQuery } from "mongoose";
+
 import {
     type Action,
     errorHandler,
@@ -5,20 +7,21 @@ import {
     type Pagination,
     pipelines,
     searchFields,
-} from "@/shared/index.js";
-import type { UpdateQuery } from "mongoose";
+} from "@Shared";
 import { type IUser, type RegisterSchema, userModel } from "./index.js";
 
 class UserStore {
     private getDataFn = (query: string) => () =>
-        userModel.find(
-            query !== ""
-                ? { $or: searchFields(pipelines.user.searchFields, query) }
-                : {}
-        );
+        userModel.find({
+            $or:
+                query !== ""
+                    ? searchFields(pipelines.user.searchFields, query)
+                    : [],
+            isAdmin: false,
+        });
 
-    getAllUsers = (query: string, pagination?: Required<Pagination>) =>
-        paginateData(this.getDataFn(query), "users", pagination);
+    getAllCustomers = (query: string, pagination?: Required<Pagination>) =>
+        paginateData(this.getDataFn(query), "customers", pagination);
 
     getUserByEmail = (email: string) =>
         errorHandler(
@@ -38,7 +41,7 @@ class UserStore {
         errorHandler(
             () => {
                 const selectQuery = userModel.findById(id);
-                if (password) return selectQuery.select("password");
+                if (password) return selectQuery.select("+password");
                 return selectQuery;
             },
             "getting user by id",

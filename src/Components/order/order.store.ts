@@ -12,6 +12,7 @@ import {
 } from "@Shared";
 import {
     orderModel,
+    ordersStatus,
     type FullOrder,
     type IOrder,
     type PostOrderSchema,
@@ -59,7 +60,11 @@ class OrderStore {
         });
 
     getOrdersCount = () =>
-        errorHandler(() => orderModel.countDocuments(), "getting orders count");
+        errorHandler(
+            () =>
+                orderModel.countDocuments({ status: ordersStatus.PROCESSING }),
+            "getting orders count"
+        );
 
     getOrder = (id: string) =>
         errorHandler(
