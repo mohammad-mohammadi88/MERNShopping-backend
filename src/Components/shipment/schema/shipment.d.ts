@@ -1,5 +1,6 @@
 import type { Document, Types } from "mongoose";
 
+import type { IOrder } from "@Order/index.ts";
 import type { ShipmentStatusValue } from "../shipment.status.ts";
 
 export default interface IShipment extends Document {
@@ -11,4 +12,8 @@ export default interface IShipment extends Document {
     status: ShipmentStatusValue;
     createdAt: Date;
     updatedAt: Date;
+}
+
+export interface FullShipment extends Omit<IShipment, "order"> {
+    order: IOrder;
 }

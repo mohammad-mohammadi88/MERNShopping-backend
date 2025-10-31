@@ -1,6 +1,5 @@
 import type { PipelineStage } from "mongoose";
 
-import { couponModel } from "@Coupon/index.js";
 import {
     errorHandler,
     paginateData,
@@ -68,20 +67,11 @@ class OrderStore {
 
     getOrder = (id: string) =>
         errorHandler(
-            async (): Promise<FullOrder | null> => {
-                const order = await orderModel
+            async (): Promise<FullOrder | null> =>
+                (await orderModel
                     .findById(id)
                     .lean()
-                    .populate(["user", "products.product"]);
-                if (!order) return null;
-                if (order.couponCode) {
-                    const coupon = await couponModel
-                        .findOne({ code: order.couponCode })
-                        .lean();
-                    order.couponCode = coupon as any;
-                }
-                return order as unknown as FullOrder;
-            },
+                    .populate(["products.product"])) as FullOrder | null,
             "getting one order",
             {
                 notFoundError: `Order with id #${id} doesn't exists`,

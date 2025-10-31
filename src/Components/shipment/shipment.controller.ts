@@ -1,5 +1,4 @@
 import type { RequestHandler } from "express";
-import type { ObjectId } from "mongoose";
 
 import { validate } from "@Middlewares";
 import { orderStore, ordersStatus } from "@Order/index.js";
@@ -18,7 +17,6 @@ import {
     type AddShipmentData,
     type AddShipmentSchema,
     type EditShipmentStatusSchema,
-    type FullShipment,
     type IShipment,
 } from "./index.js";
 import { ShipmentStatusValidator } from "./services/index.js";
@@ -43,11 +41,29 @@ const addShipmentCTRL: RequestHandler<
     } = await orderStore.getOrder(orderId);
     if (orderError || !order) return res.status(orderStatus).send(orderError);
 
+    // only orders user can
+    const orderUserId = order.user._id.toString();
+    const requestedUserId = req.user.id;
+    if (orderUserId !== requestedUserId)
+        return res.status(400).send("You cannot add shipment to others order");
+
+    // we don't need second shipment
+    if (order?.shipment)
+        return res.status(400).send("This order already has shipment");
+
+    // only PAID status is acceptable
+    if (order.status === ordersStatus.INIT)
+        return res
+            .status(400)
+            .send("You cannot add shipment for non paid order");
+    if (order.status !== ordersStatus.PAID)
+        return res.status(400).send("You cannot add shipment to this order");
+
     const newShipment: AddShipmentData = {
         order: orderId,
         selectedDate,
         note,
-        user: (order.user._id as ObjectId).toString(),
+        user: orderUserId,
     };
     const {
         status: shipmentStatus,
@@ -137,7 +153,7 @@ export const editShimpentStatusHandler: any[] = [
 // get single Shipment
 export const getSingleShipmentHandler: RequestHandler<
     { id: string },
-    string | FullShipment
+    string | IShipment
 > = async (req, res) => {
     const shipmentId = req.params.id;
 

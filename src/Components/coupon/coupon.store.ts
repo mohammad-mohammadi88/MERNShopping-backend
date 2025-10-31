@@ -9,8 +9,7 @@ import {
 } from "@Shared";
 import {
     couponModel,
-    couponStatus,
-    type ICoupon,
+    type FullCoupon,
     type PostCouponSchema,
 } from "./index.js";
 
@@ -21,7 +20,7 @@ const couponNotFound = (code: string): string =>
 type GetterFnParams = { status: number | undefined } & IQuery;
 class CouponStore {
     private getDataFn =
-        ({ query, status }: GetterFnParams): GetDataFn<ICoupon> =>
+        ({ query, status }: GetterFnParams): GetDataFn<FullCoupon> =>
         () =>
             this.searchData(
                 query,
@@ -32,7 +31,7 @@ class CouponStore {
         pagination,
         ...params
     }: PaginationWithStatus & GetterFnParams) =>
-        paginateData<ICoupon>(this.getDataFn(params), "coupons", pagination);
+        paginateData<FullCoupon>(this.getDataFn(params), "coupons", pagination);
 
     private searchData = (
         query: string,
@@ -69,13 +68,9 @@ class CouponStore {
             { notFoundError: couponNotFound(code) }
         );
 
-    inactivateCoupon = (code: string) =>
+    updateCouponStatus = (code: string, status: number) =>
         errorHandler(
-            () =>
-                couponModel.findOneAndUpdate(
-                    { code },
-                    { status: couponStatus.INACTIVE }
-                ),
+            () => couponModel.findOneAndUpdate({ code }, { status }),
             "invalidating coupon",
             { notFoundError: couponNotFound(code) }
         );

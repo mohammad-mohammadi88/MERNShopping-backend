@@ -16,7 +16,6 @@ import {
     paginationHandler,
 } from "@Shared";
 import {
-    type FullPayment,
     type IPayment,
     type NewPaymentData,
     type UpdatePaymentData,
@@ -149,7 +148,7 @@ export const getAllPaymentsHandler: RequestHandler<
 // get single payment
 export const getSinglePaymentHandler: RequestHandler<
     { id: string },
-    string | FullPayment
+    string | IPayment
 > = async (req, res) => {
     const { status, data, error } = await paymentStore.getSinglePayment(
         req.params.id

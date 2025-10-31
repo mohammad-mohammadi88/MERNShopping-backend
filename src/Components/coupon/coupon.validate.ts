@@ -1,7 +1,9 @@
 import { z } from "zod";
 
 import { userSchema } from "@Shared";
+import couponStatus, { type CouponStatusValue } from "./coupon.status.js";
 
+// add coupon
 const discountSchema = z
     .object({
         role: z.enum(
@@ -30,3 +32,17 @@ export const postCouponSchema = z.object({
     user: userSchema,
 });
 export type PostCouponSchema = z.infer<typeof postCouponSchema>;
+
+// edit coupon status
+const invalidStatusError = {
+    error: `Coupon status can only be one of ${Object.values(couponStatus).join(
+        ", "
+    )} values`,
+    path: ["status"],
+};
+const statusValidator = (status: number): boolean =>
+    (Object.values(couponStatus) as number[]).includes(status);
+export const editCouponStatusSchema = z.object({
+    status: z.number().refine(statusValidator, invalidStatusError),
+});
+export type EditCouponStatusSchema = { status: CouponStatusValue };

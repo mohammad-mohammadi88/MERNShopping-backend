@@ -2,13 +2,8 @@ import { Schema, type ObjectId } from "mongoose";
 
 import { orderStore } from "@Order/index.js";
 import { reference, statusSchema } from "@Shared";
-import type { IUser } from "@User/index.js";
 import paymentStatus from "../payment.status.js";
 import type IPayment from "./payment.d.js";
-
-export interface FullPayment extends Omit<IPayment, "user"> {
-    user: IUser;
-}
 
 export { type IPayment };
 const paymentSchema = new Schema<IPayment>(

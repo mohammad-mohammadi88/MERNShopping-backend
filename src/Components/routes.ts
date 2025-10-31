@@ -22,10 +22,10 @@ appRouter.use(auth);
 appRouter.use("/orders", orderRouter);
 appRouter.use("/payments", paymentRouter);
 appRouter.use("/comments", commentRouter);
+appRouter.use("/shipments", shipmentRouter);
 
 // admin routes
 appRouter.use(authAdmin);
 appRouter.use("/coupons", couponRouter);
-appRouter.use("/shipments", shipmentRouter);
 
 export default appRouter;

@@ -1,7 +1,7 @@
 import type { RequestHandler } from "express";
 
 import couponCodeGenerator from "@Coupon/couponCodeGenerator.js";
-import { validateAsync } from "@Middlewares";
+import { validate, validateAsync } from "@Middlewares";
 import {
     paginationHandler,
     type GetDataWithPagination,
@@ -10,9 +10,13 @@ import {
     type Status,
 } from "@Shared";
 import {
+    couponStatus,
     couponStore,
+    editCouponStatusSchema,
     postCouponSchema,
     type Code,
+    type EditCouponStatusSchema,
+    type FullCoupon,
     type ICoupon,
     type PostCouponSchema,
 } from "./index.js";
@@ -20,7 +24,7 @@ import {
 // get all coupons
 export const getAllCouponsHandler: RequestHandler<
     null,
-    string | GetDataWithPagination<ICoupon>,
+    string | GetDataWithPagination<FullCoupon>,
     null,
     Status & Pagination & IQuery
 > = async (req, res) => {
@@ -64,3 +68,42 @@ export const getCouponWithCodeHandler: RequestHandler<
     );
     return res.status(status).send(data || error);
 };
+
+const editCouponStatusCTRL: RequestHandler<
+    { code: string },
+    string | ICoupon,
+    EditCouponStatusSchema
+> = async (req, res) => {
+    const newStatus = req.body.status;
+    const couponCode = req.params.code;
+    const {
+        status: couponStatusCode,
+        data: prevCoupon,
+        error: couponError,
+    } = await couponStore.getCoupon(couponCode);
+    if (couponError || !prevCoupon)
+        return res.status(couponStatusCode).send(couponError);
+
+    const { status: oldStatus, limit, used, expiresAt } = prevCoupon;
+    if (oldStatus === newStatus)
+        return res
+            .status(400)
+            .send("You don't need to update coupon status to same state");
+
+    const isExpired = expiresAt.getTime() >= Date.now();
+    const isUsedEnough = limit === used;
+    if (newStatus === couponStatus.ACTIVE && (isUsedEnough || isExpired))
+        return res
+            .status(400)
+            .send("You cannot activate expired and used coupon");
+
+    const { status, data, error } = await couponStore.updateCouponStatus(
+        couponCode,
+        newStatus
+    );
+    return res.status(status).send(data || error);
+};
+export const editCouponStatusHandler: any[] = [
+    validate(editCouponStatusSchema),
+    editCouponStatusCTRL,
+];

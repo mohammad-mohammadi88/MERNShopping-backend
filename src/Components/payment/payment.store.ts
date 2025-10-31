@@ -11,7 +11,6 @@ import {
 } from "@Shared";
 import {
     paymentModel,
-    type FullPayment,
     type IPayment,
     type PaymentStatusValue,
 } from "./index.js";
@@ -65,16 +64,9 @@ class PaymentStore {
         });
 
     getSinglePayment = (id: string) =>
-        errorHandler(
-            () =>
-                paymentModel
-                    .findById(id)
-                    .populate(["user"]) as unknown as Promise<FullPayment>,
-            "getting payment",
-            {
-                notFoundError: `payment with id ${id} doesn't exists`,
-            }
-        );
+        errorHandler(() => paymentModel.findById(id), "getting payment", {
+            notFoundError: `payment with id ${id} doesn't exists`,
+        });
 
     updatePayment = (order: string, data: UpdatePaymentData) =>
         errorHandler(

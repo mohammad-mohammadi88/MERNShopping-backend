@@ -9,7 +9,7 @@ import {
     type IQuery,
     type PaginationWithStatus,
 } from "@Shared";
-import { shipmentModel, type FullShipment, type IShipment } from "./index.js";
+import { shipmentModel, type IShipment } from "./index.js";
 
 export interface AddShipmentData {
     user: string;
@@ -55,12 +55,11 @@ class ShipmentStore {
 
     getShipmentById = (id: string) =>
         errorHandler(
-            () =>
-                shipmentModel
-                    .findById(id)
-                    .populate(["user"]) as Promise<FullShipment | null>,
+            () => shipmentModel.findById(id).populate(["order"]),
             "getting shipment",
-            { notFoundError: `Shipment with id #${id} doesn't exists` }
+            {
+                notFoundError: `Shipment with id #${id} doesn't exists`,
+            }
         );
 
     shipmentExistsWithOrderId = (order: string) =>

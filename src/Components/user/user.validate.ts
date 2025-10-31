@@ -14,21 +14,12 @@ const password = z
             regex: RegExp;
         }
         const validations: Validation[] = [
+            { regex: /[a-z]/, message: "lower case word" },
+            { regex: /[A-Z]/, message: "upper case words" },
+            { regex: /[0-9]/, message: "numbers" },
             {
-                message: "lower case word",
-                regex: /[a-z]/,
-            },
-            {
-                message: "upper case words",
-                regex: /[A-Z]/,
-            },
-            {
-                message: "numbers",
-                regex: /[0-9]/,
-            },
-            {
-                message: "special characters such as ;:/\\*%&",
                 regex: /[!@#\$%\^&\*\(\)\-\_\+\=\[\]\{\}\\\|;:'",<\.>\/\?~`]/,
+                message: "special characters such as ;:/*\\%@&",
             },
         ];
         validations.forEach(
@@ -37,8 +28,9 @@ const password = z
                 ctx.addIssue(addError(`Password must include ${message}`))
         );
     });
-const phoneRegex = new RegExp(/^0?[1-9]\d{1,14}$/);
+const phoneRegex = new RegExp(/^0?[1-9]\d{9,13}$/);
 const mobile = z.string().regex(phoneRegex, "Invalid Phone number");
+const email = z.email();
 
 export const userAddressSchema = z
     .object({
@@ -69,7 +61,7 @@ export type LoginSchema = z.infer<typeof loginSchema>;
 type RegisterRefineFields = keyof Omit<RegisterSchema, "password" | "mobile">;
 export const registerSchema = z
     .object({
-        email: z.email(),
+        email,
         password,
         firstName: z.string(),
         lastName: z.string(),
@@ -97,7 +89,7 @@ export type RegisterSchema = z.infer<typeof registerSchema>;
 
 const auth = z
     .object({
-        email: z.email(),
+        email,
         password: z.object({
             prev: password,
             next: password,

@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+    editCouponStatusHandler,
     getAllCouponsHandler,
     getCouponWithCodeHandler,
     postCouponHandler,
@@ -11,5 +12,6 @@ const router = express.Router();
 router.get("/", getAllCouponsHandler);
 router.post("/", postCouponHandler);
 router.get("/:code", getCouponWithCodeHandler);
+router.patch("/:code", editCouponStatusHandler);
 
 export default router;

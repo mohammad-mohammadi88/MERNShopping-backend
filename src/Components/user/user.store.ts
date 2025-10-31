@@ -45,9 +45,7 @@ class UserStore {
                 return selectQuery;
             },
             "getting user by id",
-            {
-                notFoundError: `User with id #${id} not found`,
-            }
+            { notFoundError: `User with id #${id} not found` }
         );
 
     deleteUser = (id: string) =>

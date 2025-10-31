@@ -1,10 +1,14 @@
 import { Schema } from "mongoose";
 
 import { errorHandler, reference, statusSchema } from "@Shared";
+import type { IUser } from "@User/index.js";
 import couponStatus from "../coupon.status.js";
 import type ICoupon from "./coupon.d.js";
 
 export { type ICoupon };
+export interface FullCoupon extends Omit<ICoupon, "user"> {
+    user: IUser;
+}
 const DiscountSchema = new Schema(
     {
         role: { type: String, enum: ["number", "percent"], required: true },
