@@ -128,18 +128,27 @@ export const getProductCommentsHandler: RequestHandler<
     { productId: string },
     string | GetDataWithPagination<IComment>,
     null,
-    Status & Pagination & IQuery
+    Pagination & IQuery
 > = async (req, res) => {
     const product = req.params.productId;
-    const reqStatus = req.query.status;
     const query = req.query.query || "";
 
     const pagination = paginationHandler(req);
     const { status, data, error } = await commentStore.getAllComments({
-        status: reqStatus ? Number(reqStatus) : undefined,
+        status: undefined,
         product,
         query,
         pagination,
     });
+    return res.status(status).send(data || error);
+};
+
+// get single comment
+export const getSingleCommentHandler: RequestHandler<
+    { id: string },
+    string | IComment
+> = async (req, res) => {
+    const id = req.params.id;
+    const { status, data, error } = await commentStore.getSingleComment(id);
     return res.status(status).send(data || error);
 };

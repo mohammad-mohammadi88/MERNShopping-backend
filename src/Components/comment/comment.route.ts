@@ -5,15 +5,17 @@ import {
     addCommentHandler,
     getAllCommentHandler,
     getProductCommentsHandler,
+    getSingleCommentHandler,
     updateCommentHandler,
 } from "./comment.controller.js";
 
 const router = express.Router();
 
 router.post("/", addCommentHandler);
-router.get("/:productId", getProductCommentsHandler);
+router.get("/product/:productId", getProductCommentsHandler);
 
 router.use(authAdmin);
+router.get("/:id", getSingleCommentHandler);
 router.get("/", getAllCommentHandler);
 router.patch("/:id", updateCommentHandler);
 

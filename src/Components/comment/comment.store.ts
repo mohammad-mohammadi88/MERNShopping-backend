@@ -11,6 +11,7 @@ import {
 } from "@Shared";
 import {
     commentModel,
+    commentStatus,
     type AddCommentSchema,
     type CommentStatusValue,
     type IComment,
@@ -49,12 +50,17 @@ class CommentStore {
             product,
         }: GetterFnParams & CommentProduct): GetDataFn<IComment> =>
         () => {
-            const pipeline: PipelineStage[] = [];
-            if (status) pipeline.push({ $match: { status } });
+            let pipeline: PipelineStage[] = [];
+            if (status) pipeline = [{ $match: { status } }];
             if (product)
-                pipeline.push({
-                    $match: { product: new Types.ObjectId(product) },
-                });
+                pipeline = [
+                    {
+                        $match: {
+                            product: new Types.ObjectId(product),
+                            status: commentStatus.APPROVED,
+                        },
+                    },
+                ];
 
             return this.searchData(query, pipeline) as any;
         };

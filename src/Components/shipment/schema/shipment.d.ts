@@ -7,7 +7,7 @@ export default interface IShipment extends Document {
     user: Types.ObjectId;
     order: Types.ObjectId;
     selectedDate: Date;
-    deliveredAt: Date;
+    deliveredAt: Date | null;
     note?: string;
     status: ShipmentStatusValue;
     createdAt: Date;
