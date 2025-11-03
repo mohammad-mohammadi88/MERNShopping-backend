@@ -21,15 +21,14 @@ class ProductStore {
             pagination
         );
 
-    private searchData = (query: string) => {
-        const productFields = pipelines.product.searchFields;
-        const pipeline = searchAggretion(
-            pipelines.product.pipeline,
-            productFields,
-            query
+    private searchData = (query: string) =>
+        productModel.aggregate(
+            searchAggretion(
+                pipelines.product.pipeline,
+                pipelines.product.searchFields,
+                query
+            )
         );
-        return productModel.aggregate(pipeline);
-    };
 
     addProduct = (data: PostProductSchema & Images) =>
         errorHandler(() => productModel.create(data), "creating new product", {
@@ -38,7 +37,12 @@ class ProductStore {
 
     getProductById = (id: string) =>
         errorHandler(
-            () => productModel.findById(id).populate(["productCategory"]),
+            () =>
+                productModel
+                    .findById(id)
+                    .populate(["productCategory"])
+                    .lean()
+                    .exec(),
             "getting product by id",
             {
                 notFoundError: `Product with id #${id} not found`,
@@ -50,10 +54,14 @@ class ProductStore {
         const $gte = quantityEffect > 0 ? -1 : Math.abs(quantityEffect);
         return errorHandler(
             async () =>
-                await productModel.findOneAndUpdate(
-                    { _id, quantity: { $gte } },
-                    { $inc: { quantity: quantityEffect } }
-                ),
+                await productModel
+                    .findOneAndUpdate(
+                        { _id, quantity: { $gte } },
+                        { $inc: { quantity: quantityEffect } },
+                        { new: true }
+                    )
+                    .lean()
+                    .exec(),
             `${action}ing product quantity with id #${_id}`,
             {
                 notFoundError: `Unable to ${action}e product with id #${_id} quantity`,
@@ -63,20 +71,24 @@ class ProductStore {
 
     editProduct = (id: string, data: EditProductSchema & Images) =>
         errorHandler(
-            () => productModel.findByIdAndUpdate(id, data),
+            () =>
+                productModel
+                    .findByIdAndUpdate(id, data, { new: true })
+                    .lean()
+                    .exec(),
             "editing product",
             { notFoundError: `Product with id #${id} not found` }
         );
 
     deleteProduct = (id: string) =>
         errorHandler(
-            () => productModel.findByIdAndDelete(id),
+            () => productModel.findByIdAndDelete(id).exec(),
             "deleting product",
             { notFoundError: `Product with id #${id} not found` }
         );
 
     isProductExists = async (_id: string): Promise<boolean> =>
-        !!(await productModel.exists({ _id }))?._id;
+        !!(await productModel.exists({ _id }).exec())?._id;
 }
 
 export default new ProductStore();

@@ -97,6 +97,7 @@ const pipelines: Record<PipelineNames, CollectionPipeline> = {
             ...userSearchFields,
             "product.productCategory.title",
             "product.productCategory.attrs.title",
+            "product.title",
             "product.productCategory.attrs.description",
             "title",
             "body",

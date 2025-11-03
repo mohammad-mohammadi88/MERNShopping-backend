@@ -36,16 +36,15 @@ class CouponStore {
     private searchData = (
         query: string,
         extraSearch?: PipelineStage[] | undefined
-    ) => {
-        const couponFields = ["code", ...pipelines.user.searchFields];
-        const pipeline = searchAggretion(
-            pipelines.user.pipeline,
-            couponFields,
-            query,
-            extraSearch
+    ) =>
+        couponModel.aggregate(
+            searchAggretion(
+                pipelines.user.pipeline,
+                ["code", ...pipelines.user.searchFields],
+                query,
+                extraSearch
+            )
         );
-        return couponModel.aggregate(pipeline);
-    };
 
     addCoupon = (data: PostCouponSchema & Code) =>
         errorHandler(() => couponModel.create(data), "adding new coupon", {
@@ -53,24 +52,36 @@ class CouponStore {
         });
 
     getCoupon = (code: string) =>
-        errorHandler(() => couponModel.findOne({ code }), "getting coupon", {
-            notFoundError: couponNotFound(code),
-        });
+        errorHandler(
+            () => couponModel.findOne({ code }).lean().exec(),
+            "getting coupon",
+            {
+                notFoundError: couponNotFound(code),
+            }
+        );
 
     changeCouponUsedTimes = (code: string, action: Action = "increas") =>
         errorHandler(
             () =>
-                couponModel.findOneAndUpdate(
-                    { code, used: { $gt: action === "increas" ? -1 : 0 } },
-                    { $inc: { used: action === "increas" ? 1 : -1 } }
-                ),
+                couponModel
+                    .findOneAndUpdate(
+                        { code, used: { $gt: action === "increas" ? -1 : 0 } },
+                        { $inc: { used: action === "increas" ? 1 : -1 } },
+                        { new: true }
+                    )
+                    .lean()
+                    .exec(),
             `${action}ing coupon used count`,
             { notFoundError: couponNotFound(code) }
         );
 
     updateCouponStatus = (code: string, status: number) =>
         errorHandler(
-            () => couponModel.findOneAndUpdate({ code }, { status }),
+            () =>
+                couponModel
+                    .findOneAndUpdate({ code }, { status })
+                    .lean()
+                    .exec(),
             "invalidating coupon",
             { notFoundError: couponNotFound(code) }
         );

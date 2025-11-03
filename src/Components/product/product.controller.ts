@@ -9,11 +9,13 @@ import {
     type IQuery,
     type Pagination,
 } from "@Shared";
+import commentStore from "../comment/comment.store.js";
 import {
     editProductSchema,
     postProductSchema,
     productStore,
     type EditProductSchema,
+    type FullProduct,
     type IProduct,
     type PostProductSchema,
 } from "./index.js";
@@ -66,11 +68,22 @@ export const getAllProductsHandler: RequestHandler<
 // Get Product By Id
 export const getProductByIdHandler: RequestHandler<
     ParamID,
-    string | IProduct
+    string | FullProduct
 > = async (req, res) => {
-    const id = req.params.id;
-    const { status, data, error } = await productStore.getProductById(id);
-    return res.status(status).send(error || data);
+    const product = req.params.id;
+    const {
+        status: commentsStatus,
+        data: comments,
+        error: commentsError,
+    } = await commentStore.getAllComments({ product });
+    if (commentsError || !comments)
+        return res.status(commentsStatus).send(commentsError);
+
+    const { status, data, error } = await productStore.getProductById(product);
+    if (error || !data) return res.status(status).send(error);
+
+    // @ts-ignore
+    return res.status(status).send({ ...data, comments: comments.data });
 };
 
 // edit Product By Id

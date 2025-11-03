@@ -9,11 +9,13 @@ import {
     type GetterFnParams,
     type PaginationWithStatus,
 } from "@Shared";
+import { couponStore, type ICoupon } from "../coupon/index.js";
 import {
     orderModel,
     ordersStatus,
     type FullOrder,
     type IOrder,
+    type OrderWithCoupon,
     type PostOrderSchema,
 } from "./index.js";
 
@@ -68,10 +70,31 @@ class OrderStore {
     getOrder = (id: string) =>
         errorHandler(
             async (): Promise<FullOrder | null> =>
-                (await orderModel
+                orderModel
                     .findById(id)
-                    .lean()
-                    .populate(["products.product"])) as FullOrder | null,
+                    .populate(["products.product"])
+                    .lean() as Promise<FullOrder | null>,
+            "getting one order",
+            {
+                notFoundError: `Order with id #${id} doesn't exists`,
+            }
+        );
+
+    getOrderWithCoupon = (id: string) =>
+        errorHandler(
+            async (): Promise<OrderWithCoupon | null> => {
+                const { data: order, error } = await this.getOrder(id);
+                if (error || !order) throw error;
+
+                if (order?.couponCode) {
+                    const { data, error: couponError } =
+                        await couponStore.getCoupon(order?.couponCode);
+                    if (couponError || !data) throw couponError;
+
+                    (order as OrderWithCoupon).couponCode = data as ICoupon;
+                }
+                return order as OrderWithCoupon;
+            },
             "getting one order",
             {
                 notFoundError: `Order with id #${id} doesn't exists`,
@@ -80,21 +103,33 @@ class OrderStore {
 
     editOrderStatus = (id: string, status: number) =>
         errorHandler(
-            () => orderModel.findByIdAndUpdate(id, { status }),
+            () =>
+                orderModel
+                    .findByIdAndUpdate(id, { status }, { new: true })
+                    .lean()
+                    .exec(),
             "editing order status",
             { notFoundError: `Order with id #${id} doesn't exists` }
         );
 
     editOrderData = (id: string, data: Partial<IOrder>) =>
         errorHandler(
-            () => orderModel.findByIdAndUpdate(id, data),
+            () =>
+                orderModel
+                    .findByIdAndUpdate(id, data, { new: true })
+                    .lean()
+                    .exec(),
             "editing order data",
             { notFoundError: `Order with id #${id} doesn't exists` }
         );
 
     addPaymentId = (id: string, payment: string) =>
         errorHandler(
-            () => orderModel.findByIdAndUpdate(id, { payment }),
+            () =>
+                orderModel
+                    .findByIdAndUpdate(id, { payment }, { new: true })
+                    .lean()
+                    .exec(),
             "connecting order to payment"
         );
 }

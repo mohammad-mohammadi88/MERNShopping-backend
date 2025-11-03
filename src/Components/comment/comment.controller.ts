@@ -132,10 +132,11 @@ export const getProductCommentsHandler: RequestHandler<
 > = async (req, res) => {
     const product = req.params.productId;
     const query = req.query.query || "";
+    const isAdmin = req.user.isAdmin;
 
     const pagination = paginationHandler(req);
     const { status, data, error } = await commentStore.getAllComments({
-        status: undefined,
+        status: isAdmin ? undefined : commentStatus.APPROVED,
         product,
         query,
         pagination,

@@ -40,7 +40,7 @@ class ProductCategoryStore {
 
     getCategoryById = (id: string) =>
         errorHandler(
-            () => productCategoryModel.findById(id),
+            () => productCategoryModel.findById(id).lean().exec(),
             "getting category by id",
             { notFoundError: `Category with id #${id} not found` }
         );
@@ -48,18 +48,23 @@ class ProductCategoryStore {
     changeProductCount = (_id: string, action: Action = "increas") =>
         errorHandler(
             () =>
-                productCategoryModel.findOneAndUpdate(
-                    {
-                        _id,
-                        totalProducts: { $gt: action === "increas" ? -1 : 0 },
-                    },
-                    {
-                        $inc: {
-                            totalProducts: action === "increas" ? 1 : -1,
+                productCategoryModel
+                    .findOneAndUpdate(
+                        {
+                            _id,
+                            totalProducts: {
+                                $gt: action === "increas" ? -1 : 0,
+                            },
                         },
-                    },
-                    { new: true }
-                ),
+                        {
+                            $inc: {
+                                totalProducts: action === "increas" ? 1 : -1,
+                            },
+                        },
+                        { new: true }
+                    )
+                    .lean()
+                    .exec(),
             `${action}ing product count`,
             {
                 notFoundError: `Category with id #${_id} doesn't exists`,

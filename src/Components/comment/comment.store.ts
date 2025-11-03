@@ -11,7 +11,6 @@ import {
 } from "@Shared";
 import {
     commentModel,
-    commentStatus,
     type AddCommentSchema,
     type CommentStatusValue,
     type IComment,
@@ -27,21 +26,35 @@ class CommentStore {
 
     updateStatus = (id: string, status: CommentStatusValue) =>
         errorHandler(
-            () => commentModel.findByIdAndUpdate(id, { status }, { new: true }),
+            () =>
+                commentModel
+                    .findByIdAndUpdate(id, { status }, { new: true })
+                    .lean()
+                    .exec(),
             "updating comment status",
             { notFoundError: `Comment with id #${id} not found` }
         );
 
     getSingleComment = (id: string) =>
-        errorHandler(() => commentModel.findById(id), "getting comment", {
-            notFoundError: `Comment with id #${id} not found`,
-        });
+        errorHandler(
+            () => commentModel.findById(id).lean().exec(),
+            "getting comment",
+            {
+                notFoundError: `Comment with id #${id} not found`,
+            }
+        );
 
     getAllComments = ({
         pagination,
-        ...params
-    }: PaginationWithStatus & GetterFnParams & CommentProduct) =>
-        paginateData<IComment>(this.getterFns(params), "comments", pagination);
+        query = "",
+        product,
+        status,
+    }: PaginationWithStatus & Partial<GetterFnParams> & CommentProduct) =>
+        paginateData<IComment>(
+            this.getterFns({ product, status, query }),
+            "comments",
+            pagination
+        );
 
     private getterFns =
         ({
@@ -51,16 +64,11 @@ class CommentStore {
         }: GetterFnParams & CommentProduct): GetDataFn<IComment> =>
         () => {
             let pipeline: PipelineStage[] = [];
-            if (status) pipeline = [{ $match: { status } }];
+            if (status) pipeline.push({ $match: { status } });
             if (product)
-                pipeline = [
-                    {
-                        $match: {
-                            product: new Types.ObjectId(product),
-                            status: commentStatus.APPROVED,
-                        },
-                    },
-                ];
+                pipeline.push({
+                    $match: { product: new Types.ObjectId(product) },
+                });
 
             return this.searchData(query, pipeline) as any;
         };

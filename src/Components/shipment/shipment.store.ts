@@ -55,7 +55,7 @@ class ShipmentStore {
 
     getShipmentById = (id: string) =>
         errorHandler(
-            () => shipmentModel.findById(id).populate(["order"]),
+            () => shipmentModel.findById(id).populate(["order"]).lean().exec(),
             "getting shipment",
             {
                 notFoundError: `Shipment with id #${id} doesn't exists`,
@@ -63,11 +63,15 @@ class ShipmentStore {
         );
 
     shipmentExistsWithOrderId = (order: string) =>
-        shipmentModel.exists({ order });
+        shipmentModel.exists({ order }).exec();
 
     editShipmentdata = (id: string, data: Partial<IShipment>) =>
         errorHandler(
-            () => shipmentModel.findByIdAndUpdate(id, data, { new: true }),
+            () =>
+                shipmentModel
+                    .findByIdAndUpdate(id, data, { new: true })
+                    .lean()
+                    .exec(),
             "editing shipment data",
             { notFoundError: `Shipment with id #${id} doesn't exists` }
         );

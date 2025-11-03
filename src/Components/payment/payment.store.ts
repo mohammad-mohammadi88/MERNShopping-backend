@@ -47,16 +47,15 @@ class PaymentStore {
     private searchData = (
         query: string,
         extraSearch?: PipelineStage[] | undefined
-    ) => {
-        const paymentFields = [...pipelines.user.searchFields, "currency"];
-        const pipeline = searchAggretion(
-            pipelines.user.pipeline,
-            paymentFields,
-            query,
-            extraSearch
+    ) =>
+        paymentModel.aggregate(
+            searchAggretion(
+                pipelines.user.pipeline,
+                [...pipelines.user.searchFields, "currency"],
+                query,
+                extraSearch
+            )
         );
-        return paymentModel.aggregate(pipeline);
-    };
 
     addNewPayment = (data: NewPaymentData) =>
         errorHandler(() => paymentModel.create(data), "creating payment", {
@@ -64,13 +63,17 @@ class PaymentStore {
         });
 
     getSinglePayment = (id: string) =>
-        errorHandler(() => paymentModel.findById(id), "getting payment", {
-            notFoundError: `payment with id ${id} doesn't exists`,
-        });
+        errorHandler(
+            () => paymentModel.findById(id).lean().exec(),
+            "getting payment",
+            {
+                notFoundError: `payment with id ${id} doesn't exists`,
+            }
+        );
 
     updatePayment = (order: string, data: UpdatePaymentData) =>
         errorHandler(
-            () => paymentModel.findOneAndUpdate({ order }, data),
+            () => paymentModel.findOneAndUpdate({ order }, data).lean().exec(),
             "updating payment",
             { notFoundError: `This payment doesn't exists` }
         );

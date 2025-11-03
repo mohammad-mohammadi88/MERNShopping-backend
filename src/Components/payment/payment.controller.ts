@@ -34,7 +34,7 @@ export const createSessionHandler: RequestHandler<
         status: orderStatus,
         data: order,
         error: orderError,
-    } = await orderStore.getOrder(orderId);
+    } = await orderStore.getOrderWithCoupon(orderId);
     if (orderError || !order) return res.status(orderStatus).send(orderError);
 
     // don't allow repaying
@@ -54,7 +54,7 @@ export const createSessionHandler: RequestHandler<
             return { quantity, amount, image, title };
         }),
         orderId,
-        order.couponCode
+        order?.couponCode
     );
     if (!ok) return res.status(500).send(session);
 

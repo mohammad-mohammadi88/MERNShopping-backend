@@ -139,9 +139,11 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
     req,
     res
 ) => {
-    const { email, password } = req.body;
+    const { email, password, adminPanel } = req.body;
     const { status, data, error } = await userStore.getUserByEmail(email);
     if (error || !data) return res.status(status).send(error);
+    if (adminPanel && !data.isAdmin)
+        return res.status(403).send("Normal user cannot use admin panel");
 
     const isPasswordCorrect = await cryptoPassword.comparePassword(
         password,
@@ -205,3 +207,9 @@ const registerCTRL: RequestHandler<null, string, RegisterSchema> = async (
     return res.status(201).send("ok");
 };
 export const registerHandler: any[] = [validate(registerSchema), registerCTRL];
+
+// logout => delete token
+export const logoutHandler: RequestHandler = (_, res) => {
+    res.setHeader("Set-Cookie", userCookie.deleteToken());
+    return res.status(200).send("logged out");
+};

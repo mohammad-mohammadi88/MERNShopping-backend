@@ -218,7 +218,7 @@ const editOrderStatusCTRL: RequestHandler<
         if (prevOrder.couponCode) {
             const { status: couponStatus, error: couponError } =
                 await couponStore.changeCouponUsedTimes(
-                    prevOrder.couponCode.code,
+                    prevOrder.couponCode,
                     "decreas"
                 );
             if (couponError) return res.status(couponStatus).send(couponError);

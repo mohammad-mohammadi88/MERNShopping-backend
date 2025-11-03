@@ -25,7 +25,8 @@ class UserStore {
 
     getUserByEmail = (email: string) =>
         errorHandler(
-            () => userModel.findOne({ email }).select("+password"),
+            () =>
+                userModel.findOne({ email }).select("+password").lean().exec(),
             "getting user",
             {
                 notFoundError: "no user exists with this email",
@@ -40,9 +41,9 @@ class UserStore {
     getUserById = (id: string, password: boolean = false) =>
         errorHandler(
             () => {
-                const selectQuery = userModel.findById(id);
-                if (password) return selectQuery.select("+password");
-                return selectQuery;
+                let selectQuery = userModel.findById(id);
+                if (password) selectQuery = selectQuery.select("+password");
+                return selectQuery.lean().exec();
             },
             "getting user by id",
             { notFoundError: `User with id #${id} not found` }
@@ -50,33 +51,43 @@ class UserStore {
 
     deleteUser = (id: string) =>
         errorHandler(
-            () => userModel.findByIdAndDelete(id),
+            () => userModel.findByIdAndDelete(id).lean().exec(),
             "while deleting user",
             { notFoundError: `User with id #${id} not found` }
         );
 
     editUser = (id: string, data: UpdateQuery<IUser>) =>
         errorHandler(
-            () => userModel.findByIdAndUpdate(id, data, { new: true }),
+            () =>
+                userModel
+                    .findByIdAndUpdate(id, data, { new: true })
+                    .lean()
+                    .exec(),
             "editing user info",
             { notFoundError: `There is no use with id #${id}` }
         );
 
     isUserExists = async (_id: string): Promise<boolean> =>
-        !!(await userModel.exists({ _id }))?._id;
+        !!(await userModel.exists({ _id }).exec())?._id;
 
     changeTotalOrdersCount = (_id: string, action: Action = "increas") =>
         errorHandler(
             () =>
-                userModel.findOneAndUpdate(
-                    {
-                        _id,
-                        totalOrders: { $gt: action === "increas" ? -1 : 0 },
-                    },
-                    {
-                        $inc: { totalOrders: action === "increas" ? 1 : -1 },
-                    }
-                ),
+                userModel
+                    .findOneAndUpdate(
+                        {
+                            _id,
+                            totalOrders: { $gt: action === "increas" ? -1 : 0 },
+                        },
+                        {
+                            $inc: {
+                                totalOrders: action === "increas" ? 1 : -1,
+                            },
+                        },
+                        { new: true }
+                    )
+                    .lean()
+                    .exec(),
             `${action}ing totalOrders count`,
             { notFoundError: `User with id #${_id} not found` }
         );

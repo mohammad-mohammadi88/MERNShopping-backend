@@ -6,6 +6,7 @@ import {
     getAllCustomersHandler,
     getUserHandler,
     loginHandler,
+    logoutHandler,
     registerHandler,
     updateUserHandler,
 } from "./user.controller.js";
@@ -19,6 +20,7 @@ router.get("/", getAllCustomersHandler);
 router.use(auth);
 // to get yourself info
 router.get("/self", getUserHandler());
+router.delete("/logout", logoutHandler);
 
 // to get every ones info which is just available for admins
 router.get("/:id", authAdmin, (...request) =>

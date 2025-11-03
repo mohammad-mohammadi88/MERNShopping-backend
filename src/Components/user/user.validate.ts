@@ -51,6 +51,7 @@ export const loginSchema = z
     .object({
         email: z.email(),
         password,
+        adminPanel: z.boolean().optional().default(false),
     })
     .refine(({ email, password }) => email !== password, {
         error: "Password cannot be your email address",
