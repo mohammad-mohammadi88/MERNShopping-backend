@@ -73,7 +73,7 @@ class OrderStore {
                 orderModel
                     .findById(id)
                     .populate(["products.product"])
-                    .lean() as Promise<FullOrder | null>,
+                    .lean<FullOrder | null>(),
             "getting one order",
             {
                 notFoundError: `Order with id #${id} doesn't exists`,
@@ -106,7 +106,7 @@ class OrderStore {
             () =>
                 orderModel
                     .findByIdAndUpdate(id, { status }, { new: true })
-                    .lean()
+                    .lean<IOrder>()
                     .exec(),
             "editing order status",
             { notFoundError: `Order with id #${id} doesn't exists` }
@@ -117,7 +117,7 @@ class OrderStore {
             () =>
                 orderModel
                     .findByIdAndUpdate(id, data, { new: true })
-                    .lean()
+                    .lean<IOrder>()
                     .exec(),
             "editing order data",
             { notFoundError: `Order with id #${id} doesn't exists` }
@@ -128,7 +128,7 @@ class OrderStore {
             () =>
                 orderModel
                     .findByIdAndUpdate(id, { payment }, { new: true })
-                    .lean()
+                    .lean<IOrder>()
                     .exec(),
             "connecting order to payment"
         );

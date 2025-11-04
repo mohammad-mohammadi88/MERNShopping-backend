@@ -1,10 +1,14 @@
 import { Schema } from "mongoose";
 
+import type { IOrder } from "@Order/index.js";
 import { reference, statusSchema } from "@Shared";
 import shipmentStatus from "../shipment.status.js";
 import type IShipment from "./shipment.d.js";
 
 export { type IShipment };
+export interface FullShipment extends Omit<IShipment, "order"> {
+    order: IOrder;
+}
 
 const selectedDate = {
     type: Date,

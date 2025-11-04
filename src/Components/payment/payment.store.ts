@@ -48,7 +48,7 @@ class PaymentStore {
         query: string,
         extraSearch?: PipelineStage[] | undefined
     ) =>
-        paymentModel.aggregate(
+        paymentModel.aggregate<IPayment>(
             searchAggretion(
                 pipelines.user.pipeline,
                 [...pipelines.user.searchFields, "currency"],
@@ -64,7 +64,7 @@ class PaymentStore {
 
     getSinglePayment = (id: string) =>
         errorHandler(
-            () => paymentModel.findById(id).lean().exec(),
+            () => paymentModel.findById(id).lean<IPayment>().exec(),
             "getting payment",
             {
                 notFoundError: `payment with id ${id} doesn't exists`,
@@ -73,7 +73,11 @@ class PaymentStore {
 
     updatePayment = (order: string, data: UpdatePaymentData) =>
         errorHandler(
-            () => paymentModel.findOneAndUpdate({ order }, data).lean().exec(),
+            () =>
+                paymentModel
+                    .findOneAndUpdate({ order }, data)
+                    .lean<IPayment>()
+                    .exec(),
             "updating payment",
             { notFoundError: `This payment doesn't exists` }
         );

@@ -22,7 +22,7 @@ class ProductStore {
         );
 
     private searchData = (query: string) =>
-        productModel.aggregate(
+        productModel.aggregate<IProduct>(
             searchAggretion(
                 pipelines.product.pipeline,
                 pipelines.product.searchFields,
@@ -41,7 +41,7 @@ class ProductStore {
                 productModel
                     .findById(id)
                     .populate(["productCategory"])
-                    .lean()
+                    .lean<IProduct>()
                     .exec(),
             "getting product by id",
             {
@@ -60,7 +60,7 @@ class ProductStore {
                         { $inc: { quantity: quantityEffect } },
                         { new: true }
                     )
-                    .lean()
+                    .lean<IProduct>()
                     .exec(),
             `${action}ing product quantity with id #${_id}`,
             {
@@ -74,7 +74,7 @@ class ProductStore {
             () =>
                 productModel
                     .findByIdAndUpdate(id, data, { new: true })
-                    .lean()
+                    .lean<IProduct>()
                     .exec(),
             "editing product",
             { notFoundError: `Product with id #${id} not found` }

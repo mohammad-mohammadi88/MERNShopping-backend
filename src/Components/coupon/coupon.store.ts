@@ -10,6 +10,7 @@ import {
 import {
     couponModel,
     type FullCoupon,
+    type ICoupon,
     type PostCouponSchema,
 } from "./index.js";
 
@@ -37,7 +38,7 @@ class CouponStore {
         query: string,
         extraSearch?: PipelineStage[] | undefined
     ) =>
-        couponModel.aggregate(
+        couponModel.aggregate<FullCoupon>(
             searchAggretion(
                 pipelines.user.pipeline,
                 ["code", ...pipelines.user.searchFields],
@@ -53,7 +54,7 @@ class CouponStore {
 
     getCoupon = (code: string) =>
         errorHandler(
-            () => couponModel.findOne({ code }).lean().exec(),
+            () => couponModel.findOne({ code }).lean<ICoupon>().exec(),
             "getting coupon",
             {
                 notFoundError: couponNotFound(code),
@@ -69,7 +70,7 @@ class CouponStore {
                         { $inc: { used: action === "increas" ? 1 : -1 } },
                         { new: true }
                     )
-                    .lean()
+                    .lean<ICoupon>()
                     .exec(),
             `${action}ing coupon used count`,
             { notFoundError: couponNotFound(code) }
@@ -80,7 +81,7 @@ class CouponStore {
             () =>
                 couponModel
                     .findOneAndUpdate({ code }, { status })
-                    .lean()
+                    .lean<ICoupon>()
                     .exec(),
             "invalidating coupon",
             { notFoundError: couponNotFound(code) }

@@ -55,9 +55,7 @@ export const deleteUserHandler: RequestHandler<{ id: string }, string> = async (
     req,
     res
 ) => {
-    const id = req.params.id;
-
-    const { status, error } = await userStore.deleteUser(id);
+    const { status, error } = await userStore.deleteUser(req.params.id);
     return res.status(status).send(error || "User deleted successfully");
 };
 
@@ -153,7 +151,7 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
 
     const { firstName, lastName, isAdmin, mobile } = data;
     const tokenData: AuthUser = {
-        id: (data?._id as ObjectId).toString(),
+        id: (data?._id as unknown as ObjectId).toString(),
         firstName,
         email,
         mobile,
@@ -199,7 +197,7 @@ const registerCTRL: RequestHandler<null, string, RegisterSchema> = async (
     const tokenData: AuthUser = {
         ...userInfo,
         email,
-        id: (data?._id as ObjectId).toString(),
+        id: (data?._id as unknown as ObjectId).toString(),
         isAdmin: false,
     };
     const token = jwtToken.generateToken(tokenData);

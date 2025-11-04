@@ -8,7 +8,12 @@ import {
     pipelines,
     searchFields,
 } from "@Shared";
-import { type IUser, type RegisterSchema, userModel } from "./index.js";
+import {
+    type FormatedUser,
+    type IUser,
+    type RegisterSchema,
+    userModel,
+} from "./index.js";
 
 class UserStore {
     private getDataFn = (query: string) => () =>
@@ -26,7 +31,11 @@ class UserStore {
     getUserByEmail = (email: string) =>
         errorHandler(
             () =>
-                userModel.findOne({ email }).select("+password").lean().exec(),
+                userModel
+                    .findOne({ email })
+                    .select("+password")
+                    .lean<IUser>()
+                    .exec(),
             "getting user",
             {
                 notFoundError: "no user exists with this email",
@@ -43,7 +52,7 @@ class UserStore {
             () => {
                 let selectQuery = userModel.findById(id);
                 if (password) selectQuery = selectQuery.select("+password");
-                return selectQuery.lean().exec();
+                return selectQuery.exec();
             },
             "getting user by id",
             { notFoundError: `User with id #${id} not found` }
@@ -51,7 +60,7 @@ class UserStore {
 
     deleteUser = (id: string) =>
         errorHandler(
-            () => userModel.findByIdAndDelete(id).lean().exec(),
+            () => userModel.findByIdAndDelete(id).lean<FormatedUser>().exec(),
             "while deleting user",
             { notFoundError: `User with id #${id} not found` }
         );
@@ -61,7 +70,7 @@ class UserStore {
             () =>
                 userModel
                     .findByIdAndUpdate(id, data, { new: true })
-                    .lean()
+                    .lean<FormatedUser>()
                     .exec(),
             "editing user info",
             { notFoundError: `There is no use with id #${id}` }
@@ -86,7 +95,7 @@ class UserStore {
                         },
                         { new: true }
                     )
-                    .lean()
+                    .lean<FormatedUser>()
                     .exec(),
             `${action}ing totalOrders count`,
             { notFoundError: `User with id #${_id} not found` }

@@ -9,7 +9,7 @@ import {
     type IQuery,
     type PaginationWithStatus,
 } from "@Shared";
-import { shipmentModel, type IShipment } from "./index.js";
+import { shipmentModel, type FullShipment, type IShipment } from "./index.js";
 
 export interface AddShipmentData {
     user: string;
@@ -44,7 +44,7 @@ class ShipmentStore {
         query: string,
         extraSearch?: PipelineStage[] | undefined
     ) =>
-        shipmentModel.aggregate(
+        shipmentModel.aggregate<IShipment>(
             searchAggretion(
                 pipelines.user.pipeline,
                 pipelines.user.searchFields,
@@ -55,7 +55,12 @@ class ShipmentStore {
 
     getShipmentById = (id: string) =>
         errorHandler(
-            () => shipmentModel.findById(id).populate(["order"]).lean().exec(),
+            () =>
+                shipmentModel
+                    .findById(id)
+                    .populate(["order"])
+                    .lean<FullShipment>()
+                    .exec(),
             "getting shipment",
             {
                 notFoundError: `Shipment with id #${id} doesn't exists`,
@@ -70,7 +75,7 @@ class ShipmentStore {
             () =>
                 shipmentModel
                     .findByIdAndUpdate(id, data, { new: true })
-                    .lean()
+                    .lean<IShipment>()
                     .exec(),
             "editing shipment data",
             { notFoundError: `Shipment with id #${id} doesn't exists` }

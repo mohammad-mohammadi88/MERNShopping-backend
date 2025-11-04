@@ -40,7 +40,11 @@ class ProductCategoryStore {
 
     getCategoryById = (id: string) =>
         errorHandler(
-            () => productCategoryModel.findById(id).lean().exec(),
+            () =>
+                productCategoryModel
+                    .findById(id)
+                    .lean<IProductCategory>()
+                    .exec(),
             "getting category by id",
             { notFoundError: `Category with id #${id} not found` }
         );
@@ -63,7 +67,7 @@ class ProductCategoryStore {
                         },
                         { new: true }
                     )
-                    .lean()
+                    .lean<IProductCategory>()
                     .exec(),
             `${action}ing product count`,
             {

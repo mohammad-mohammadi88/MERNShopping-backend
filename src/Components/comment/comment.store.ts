@@ -29,7 +29,7 @@ class CommentStore {
             () =>
                 commentModel
                     .findByIdAndUpdate(id, { status }, { new: true })
-                    .lean()
+                    .lean<IComment>()
                     .exec(),
             "updating comment status",
             { notFoundError: `Comment with id #${id} not found` }
@@ -37,7 +37,7 @@ class CommentStore {
 
     getSingleComment = (id: string) =>
         errorHandler(
-            () => commentModel.findById(id).lean().exec(),
+            () => commentModel.findById(id).lean<IComment>().exec(),
             "getting comment",
             {
                 notFoundError: `Comment with id #${id} not found`,
@@ -74,7 +74,7 @@ class CommentStore {
         };
 
     private searchData = (query: string, beforeSearch: PipelineStage[]) =>
-        commentModel.aggregate(
+        commentModel.aggregate<IComment>(
             searchAggretion(
                 [...beforeSearch, ...pipelines.commentProduct.pipeline],
                 pipelines.commentProduct.searchFields,
