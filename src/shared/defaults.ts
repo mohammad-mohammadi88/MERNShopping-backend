@@ -13,11 +13,6 @@ export default {
     port: Number(process.env.PORT!),
     databaseUrl: process.env.DATABASE_URL!,
     jwtPrivate: process.env.JWT_PRIVATE!,
-    redis: {
-        password: process.env.REDIS_PASSWORD!,
-        host: process.env.REDIS_HOST!,
-        port: Number(process.env.REDIS_PORT!),
-    },
     cloudinary: {
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
         api_secret: process.env.CLOUDINARY_API_SECRET!,

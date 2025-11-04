@@ -110,7 +110,6 @@ const updatePaymentStatusCTRL: RequestHandler = async (req, res) => {
     const { data: event, ok } = paymentStripe.webhook(req);
 
     if (!ok) return res.status(500).send(event);
-    console.log("event.type: ", event.type);
     if (event.type === "checkout.session.completed") await handleSuccess(event);
     else if (
         event.type === "payment_intent.canceled" ||

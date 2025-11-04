@@ -9,7 +9,6 @@ export * from "./paginateData.js";
 export { default as paginateData } from "./paginateData.js";
 export { default as paginationHandler } from "./paginationHandler.js";
 export { default as pipelines } from "./pipelines.js";
-export { default as redisConnection } from "./redis.js";
 export { default as reference } from "./reference.js";
 export * from "./schema.js";
 export { default as searchAggretion } from "./searchAggretion.js";
