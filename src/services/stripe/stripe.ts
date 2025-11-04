@@ -1,8 +1,8 @@
 import type { Request } from "express";
 import Stripe from "stripe";
 
-import defaults from "@/shared/defaults.js";
 import type { ICoupon } from "@Coupon/index.js";
+import { defaults } from "@Shared";
 import handlePrice from "./handlePrice.js";
 
 const {
@@ -82,7 +82,6 @@ const getPaymentInfo = async (session: Stripe.Checkout.Session) => {
 
     const paymentId = paymentIntent.id;
     const currency = paymentIntent.currency;
-    console.log("🚀 ~ getPaymentInfo ~ currency:", currency);
     const paidAmount = paymentIntent.amount_received / 100;
 
     return { paymentId, paidAmount, currency };
