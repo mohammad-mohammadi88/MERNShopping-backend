@@ -6,7 +6,7 @@ const serialize = (token: string) =>
         // 20 days
         maxAge: 20 * 24 * 60 * 60,
         httpOnly: true,
-        sameSite: "none",
+        // sameSite: "none",
         path,
     });
 
