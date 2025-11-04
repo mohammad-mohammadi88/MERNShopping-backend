@@ -8,9 +8,11 @@ import appRouter from "@/Components/routes.js";
 import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
 import { defaults, mongooseConnection } from "@Shared";
 
-console.log(defaults.platform);
 (async () => {
     const app = express();
+
+    // healthCheck
+    app.get("/healthCheck", (_, res) => res.send("ok"));
 
     // connect mongo
     await mongooseConnection.connect();
@@ -46,7 +48,6 @@ console.log(defaults.platform);
     app.use(express.json());
 
     // routes
-    app.get("/healthCheck", (_, res) => res.send("ok"));
     app.use(appRouter);
 
     // listen
