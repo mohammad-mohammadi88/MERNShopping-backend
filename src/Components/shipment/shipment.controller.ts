@@ -17,6 +17,7 @@ import {
     type AddShipmentData,
     type AddShipmentSchema,
     type EditShipmentStatusSchema,
+    type FullShipment,
     type IShipment,
 } from "./index.js";
 import { ShipmentStatusValidator } from "./services/index.js";
@@ -153,7 +154,7 @@ export const editShimpentStatusHandler: any[] = [
 // get single Shipment
 export const getSingleShipmentHandler: RequestHandler<
     { id: string },
-    string | IShipment
+    string | FullShipment
 > = async (req, res) => {
     const shipmentId = req.params.id;
 
