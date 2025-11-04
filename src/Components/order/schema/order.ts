@@ -26,11 +26,14 @@ const orderSchema: Schema<IOrder> = new Schema(
         deliveryAddress: { type: userAddressSchema },
     },
     { timestamps: true }
-).pre("validate", async function () {
+);
+orderSchema.pre("validate", async function () {
     if (!this.deliveryAddress) {
         const user = await userModel.findById(this.user);
         this.deliveryAddress =
-            user && user.addresses.length > 0 ? user.addresses[0] : null;
+            user && user.addresses.length > 0
+                ? user.addresses[0]
+                : (null as unknown as any);
     }
 });
 

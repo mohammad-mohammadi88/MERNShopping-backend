@@ -26,7 +26,7 @@ paymentSchema.pre("validate", async function () {
     if (error || !order) throw error;
 
     this.amount = order.finalPrice;
-    this.user = (order.user._id as ObjectId).toString() as any;
+    this.user = (order.user._id as unknown as ObjectId).toString() as any;
 });
 
 export default paymentSchema;

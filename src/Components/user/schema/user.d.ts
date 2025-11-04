@@ -1,5 +1,6 @@
 import type { Document } from "mongoose";
-import type UserAddressType from "./users.address.d.js";
+
+import type UserAddressType from "./user.address.d.js";
 
 export default interface IUser extends Document {
     firstName: string;

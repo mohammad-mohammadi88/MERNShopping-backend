@@ -8,9 +8,9 @@ import appRouter from "@/Components/routes.js";
 import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
 import { defaults, mongooseConnection } from "@Shared";
 
-const app = express();
-
 (async () => {
+    const app = express();
+
     // connect mongo
     await mongooseConnection.connect();
 
