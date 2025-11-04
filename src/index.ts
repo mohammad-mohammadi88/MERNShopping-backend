@@ -8,6 +8,7 @@ import appRouter from "@/Components/routes.js";
 import { updatePaymentStatusHandler } from "@Payment/payment.controller.js";
 import { defaults, mongooseConnection } from "@Shared";
 
+console.log(defaults.platform);
 (async () => {
     const app = express();
 
