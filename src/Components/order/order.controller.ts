@@ -134,6 +134,7 @@ const postNewOrderCTRL: RequestHandler<
     const newOrder = {
         ...req.body,
         totalPrice,
+        user: req.user.id,
         finalPrice,
     };
 

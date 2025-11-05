@@ -55,7 +55,7 @@ class OrderStore {
         return orderModel.aggregate(pipeline);
     };
 
-    postOrder = (data: PostOrderData) =>
+    postOrder = (data: PostOrderData & { user: string }) =>
         errorHandler(() => orderModel.create(data), "creating new order", {
             successStatus: 201,
         });
