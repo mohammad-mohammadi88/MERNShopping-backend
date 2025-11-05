@@ -43,7 +43,6 @@ export const createSessionHandler: RequestHandler<
 
     const calcPrice = (product: FullOrderProduct) =>
         product.product.salePrice + (product?.color?.priceEffect || 0);
-
     const { data: session, ok } = await paymentStripe.createPaymentSession(
         order.products.map((product) => {
             const {

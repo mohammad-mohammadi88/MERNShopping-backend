@@ -26,7 +26,13 @@ const createPaymentSession = async (
     const line_items: Stripe.Checkout.SessionCreateParams.LineItem[] =
         products.map(({ amount, quantity, title: name, image }) => {
             const ifCouponParams = coupon
-                ? { coupon, orderProductsCount: products.length }
+                ? {
+                      coupon,
+                      orderProductsCount: products.reduce(
+                          (prev, current) => prev + current.quantity,
+                          0
+                      ),
+                  }
                 : undefined;
             return {
                 price_data: {

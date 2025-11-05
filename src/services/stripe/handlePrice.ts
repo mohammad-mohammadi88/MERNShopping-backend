@@ -5,10 +5,7 @@ const handleNumberPrice = (
     price: number,
     couponAmount: number,
     orderProductsCount: number
-) => {
-    const discountPrice = couponAmount / orderProductsCount;
-    return Math.max(price - discountPrice, 0);
-};
+) => Math.max(price - couponAmount / orderProductsCount, 0);
 
 // to handle price when coupon role is "percent"
 const handlePercentPrice = (price: number, couponPercent: number) =>

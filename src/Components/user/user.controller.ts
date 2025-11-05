@@ -138,6 +138,7 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
     res
 ) => {
     const { email, password, adminPanel } = req.body;
+    console.log("🚀 ~ loginCTRL ~ adminPanel:", adminPanel);
     const { status, data, error } = await userStore.getUserByEmail(email);
     if (error || !data) return res.status(status).send(error);
     if (adminPanel && !data.isAdmin)
