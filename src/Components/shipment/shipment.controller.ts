@@ -19,6 +19,7 @@ import {
     type EditShipmentStatusSchema,
     type FullShipment,
     type IShipment,
+    type ShipmentStatusValue,
 } from "./index.js";
 import { ShipmentStatusValidator } from "./services/index.js";
 
@@ -42,7 +43,7 @@ const addShipmentCTRL: RequestHandler<
     } = await orderStore.getOrder(orderId);
     if (orderError || !order) return res.status(orderStatus).send(orderError);
 
-    // only orders user can
+    // only orders user can add shipment
     const orderUserId = order.user._id.toString();
     const requestedUserId = req.user.id;
     if (orderUserId !== requestedUserId)
@@ -53,12 +54,10 @@ const addShipmentCTRL: RequestHandler<
         return res.status(400).send("This order already has shipment");
 
     // only PAID status is acceptable
-    if (order.status === ordersStatus.INIT)
+    if (order.status !== ordersStatus.PAID)
         return res
             .status(400)
-            .send("You cannot add shipment for non paid order");
-    if (order.status !== ordersStatus.PAID)
-        return res.status(400).send("You cannot add shipment to this order");
+            .send("You cannot add shipment for this order order");
 
     const newShipment: AddShipmentData = {
         order: orderId,
@@ -106,6 +105,22 @@ export const getAllShipmentsHandler: RequestHandler<
 };
 
 // edit shipment status
+
+const handleOrderStatus = async (
+    orderId: string,
+    newStatus: ShipmentStatusValue
+) => {
+    const newOrderStatus =
+        newStatus === shipmentStatus.SHIPPING
+            ? ordersStatus.SHIPPING
+            : newStatus === shipmentStatus.DELIVERED
+            ? ordersStatus.RECEIVED
+            : // status Pending won't pass because of ShipmentStatusValidator
+              ordersStatus.CANCELED;
+    const { status: orderStatusCode, error: orderError } =
+        await orderStore.editOrderStatus(orderId, newOrderStatus);
+    if (orderError) return { orderStatusCode, orderError };
+};
 const editShimpentStatusCTRL: RequestHandler<
     { id: string },
     string | IShipment,
@@ -133,9 +148,16 @@ const editShimpentStatusCTRL: RequestHandler<
         return res.status(400).send(error);
     }
 
-    let newShipmentData: Partial<IShipment> = {
+    const order = await handleOrderStatus(
+        prevShipment.order._id!.toString(),
+        newStatus
+    );
+    if (order) return res.status(order.orderStatusCode).send(order.orderError);
+
+    const newShipmentData: Partial<IShipment> = {
         status: newStatus,
     };
+
     if (newStatus === shipmentStatus.DELIVERED)
         newShipmentData.deliveredAt = new Date();
 
@@ -156,10 +178,8 @@ export const getSingleShipmentHandler: RequestHandler<
     { id: string },
     string | FullShipment
 > = async (req, res) => {
-    const shipmentId = req.params.id;
-
     const { status, data, error } = await shipmentStore.getShipmentById(
-        shipmentId
+        req.params.id
     );
     return res.status(status).send(data || error);
 };

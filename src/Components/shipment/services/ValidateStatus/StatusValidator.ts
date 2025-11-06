@@ -1,5 +1,5 @@
 import {
-    DeliveredToOther,
+    EndedStatusToOther,
     InvalidStatus,
     OtherToPending,
     SameStatus,
@@ -11,12 +11,12 @@ export default class StatusValidator {
         const sameStatus = new SameStatus();
         const otherToPending = new OtherToPending();
         const invalidHandler = new InvalidStatus();
-        const deliveredStatusHandler = new DeliveredToOther();
+        const endedStatusHandler = new EndedStatusToOther();
 
         sameStatus
             .setNext(invalidHandler)
             .setNext(otherToPending)
-            .setNext(deliveredStatusHandler);
+            .setNext(endedStatusHandler);
 
         return sameStatus.process(newStatus, oldStatus);
     };

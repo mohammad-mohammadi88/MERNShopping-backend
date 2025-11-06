@@ -5,9 +5,15 @@ import {
 } from "@Shipment/shipment.status.js";
 import AbstractStatusHandler from "../AbstractStatusHandler.js";
 
-export default class DeliveredToOther extends AbstractStatusHandler {
-    public process(newStatus: any, oldStatus: ShipmentStatusValue) {
-        if (oldStatus !== shipmentStatus.DELIVERED)
+export default class EndedStatusToOther extends AbstractStatusHandler {
+    public process(
+        newStatus: ShipmentStatusValue,
+        oldStatus: ShipmentStatusValue
+    ) {
+        if (
+            oldStatus !== shipmentStatus.DELIVERED &&
+            oldStatus !== shipmentStatus.ABSENT
+        )
             return super["process"](newStatus, oldStatus);
 
         // I will make sure an invalid status doesn't pass
