@@ -28,7 +28,8 @@
             "@Order/*": ["Components/order/*"],
             "@User/*": ["Components/user/*"],
             "@Middlewares": ["middlewares/index.ts"],
-            "@Shared": ["shared/index.ts"]
+            "@Shared": ["shared/index.ts"],
+            "@Services": ["services/index.ts"]
         }
     },
     "include": ["src", "worker/image.worker.cjs"],

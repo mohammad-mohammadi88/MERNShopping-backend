@@ -2,8 +2,8 @@ import type { RequestHandler } from "express";
 import type { ObjectId, UpdateQuery } from "mongoose";
 
 import type { AuthUser } from "@/request.js";
-import { cryptoPassword, jwtToken } from "@/services/index.js";
 import { authAdmin, validate } from "@Middlewares";
+import { cryptoPassword, jwtToken, loginLimit } from "@Services";
 import {
     paginationHandler,
     type GetDataWithPagination,
@@ -138,7 +138,6 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
     res
 ) => {
     const { email, password, adminPanel } = req.body;
-    console.log("🚀 ~ loginCTRL ~ adminPanel:", adminPanel);
     const { status, data, error } = await userStore.getUserByEmail(email);
     if (error || !data) return res.status(status).send(error);
     if (adminPanel && !data.isAdmin)
@@ -163,7 +162,11 @@ const loginCTRL: RequestHandler<null, string, LoginSchema> = async (
     res.setHeader("Set-Cookie", userCookie.serialize(token));
     return res.status(200).send("ok");
 };
-export const loginHandler: any[] = [validate(loginSchema), loginCTRL];
+export const loginHandler: any[] = [
+    loginLimit,
+    validate(loginSchema),
+    loginCTRL,
+];
 
 // register user
 const registerCTRL: RequestHandler<null, string, RegisterSchema> = async (
