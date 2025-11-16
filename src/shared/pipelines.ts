@@ -69,6 +69,7 @@ const pipelines: Record<PipelineNames, CollectionPipeline> = {
             "attrs.title",
             "attrs.description",
             "productCategory.title",
+            "productCategory._id",
         ],
     },
     commentProduct: {
